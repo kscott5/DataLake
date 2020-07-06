@@ -1,5 +1,7 @@
 import random
 import json
+import uuid
+import pymongo
 
 # Simple script that generates random mock Disability and Health Data System sample data
 # https://www.cdc.gov/ncbddd/disabilityandhealth/features/disability-health-data.html
@@ -91,6 +93,7 @@ class dhdsMockData:
     def __init__(self):
         super().__init__()
 
+        self._id = str(uuid.uuid4()) #convert to string
         self.disabilityTypes = disabilityTypes_sampler(disabilityTypes,random.randint(0,disabilityTypes_len))
         self.healthTypes = healthTypes_sampler(healthTypes,random.randint(0,healthTypes_len))
 
@@ -108,8 +111,26 @@ class dhdsMockData:
 
 dataList = []
 
-for i in range(100000) : # This could execute for a minute depending on the range in use.
+for i in range(10) : # This could execute for a minute depending on the range in use.
     data = dhdsMockData()
     dataList.append(data)
-
 print(json_generator(dataList))
+
+client = pymongo.MongoClient("localhost", 27017)
+db = client.get_database("datalake")
+col = db.get_collection("dsdh")
+col.insert_many([
+    {
+        '_id': str(uuid.uuid4()),
+        'disabilityTypes': disabilityTypes_sampler(disabilityTypes,random.randint(0,disabilityTypes_len)),
+        'healthTypes': healthTypes_sampler(healthTypes,random.randint(0,healthTypes_len)),
+        'gender': genderTypes_choice(genderTypes),
+        'age': age_generator(age_min,age_max),
+        #'hasDisabilities': (len(self['disabilityTypes']) > 0)? 'true': false',
+        'educationLevel': educationTypes_choice(educationTypes),
+        'salaryRange': salaryRangeTypes_choice(salaryRangeTypes),
+        'employmentStatus': employmentTypes_choice(employmentTypes),
+        'martialStatus': relationshipStatusTypes_choice(relationshipStatusTypes)
+    } for i in range(10)])
+
+client.close()
