@@ -1,5 +1,6 @@
 import random
 import json
+
 import uuid
 import pymongo
 
@@ -84,10 +85,11 @@ relationshipStatusTypes = [
 educationTypes_choice = random.choice #Saves the choice([]) function for use later
 educationTypes = ['High School Diploma/GED', 'Some College', 'Continuous Education', 'Associate Degree', 'Bachelor Degree', 'Master Degree', 'PhD Degree', 'Certification(s)', 'Other']
 
-def json_generator(data):
+def jsonLoads(data):
     #https://stackoverflow.com/questions/3768895/how-to-make-a-class-json-serializable
-    return json.dumps(data, default=lambda o: o.__dict__, 
+    dataDump = json.dumps(data, default=lambda o: o.__dict__, 
         sort_keys=True, indent=4)
+    return json.loads(dataDump)
 
 class dhdsMockData: 
     def __init__(self):
@@ -109,28 +111,17 @@ class dhdsMockData:
         self.employmentStatus = employmentTypes_choice(employmentTypes)
         self.martialStatus = relationshipStatusTypes_choice(relationshipStatusTypes)
 
-dataList = []
+dhdsList = []
+for i in range(100000) : # This could execute for a minute depending on the range in use.
+    item = dhdsMockData()
+    dhdsList.append(item)
 
-for i in range(10) : # This could execute for a minute depending on the range in use.
-    data = dhdsMockData()
-    dataList.append(data)
-print(json_generator(dataList))
+dataDict = jsonLoads(dhdsList)
 
 client = pymongo.MongoClient("localhost", 27017)
 db = client.get_database("datalake")
+
 col = db.get_collection("dsdh")
-col.insert_many([
-    {
-        '_id': str(uuid.uuid4()),
-        'disabilityTypes': disabilityTypes_sampler(disabilityTypes,random.randint(0,disabilityTypes_len)),
-        'healthTypes': healthTypes_sampler(healthTypes,random.randint(0,healthTypes_len)),
-        'gender': genderTypes_choice(genderTypes),
-        'age': age_generator(age_min,age_max),
-        #'hasDisabilities': (len(self['disabilityTypes']) > 0)? 'true': false',
-        'educationLevel': educationTypes_choice(educationTypes),
-        'salaryRange': salaryRangeTypes_choice(salaryRangeTypes),
-        'employmentStatus': employmentTypes_choice(employmentTypes),
-        'martialStatus': relationshipStatusTypes_choice(relationshipStatusTypes)
-    } for i in range(10)])
+col.insert_many(dataDict)
 
 client.close()
