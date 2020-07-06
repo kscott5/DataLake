@@ -108,7 +108,7 @@ class dhdsMockData:
 
 dataList = []
 
-for i in range(1000) : # This could execute for a minute depending on the range in use.
+for i in range(100000) : # This could execute for a minute depending on the range in use.
     data = dhdsMockData()
     dataList.append(data)
 
