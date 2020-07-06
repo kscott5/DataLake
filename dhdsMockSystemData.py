@@ -85,26 +85,6 @@ relationshipStatusTypes = [
 educationTypes_choice = random.choice #Saves the choice([]) function for use later
 educationTypes = ['High School Diploma/GED', 'Some College', 'Continuous Education', 'Associate Degree', 'Bachelor Degree', 'Master Degree', 'PhD Degree', 'Certification(s)', 'Other']
 
-class dhdsMockData: 
-    def __init__(self):
-        super().__init__()
-
-        self._id = str(uuid.uuid4()) #convert to string
-        self.disabilityTypes = disabilityTypes_sampler(disabilityTypes,random.randint(0,disabilityTypes_len))
-        self.healthTypes = healthTypes_sampler(healthTypes,random.randint(0,healthTypes_len))
-
-        self.gender = genderTypes_choice(genderTypes)
-        self.age = age_generator(age_min,age_max)    
-
-        self.hasDisabilities = False
-        if len(self.disabilityTypes) > 0:
-            self.hasDisabilities = True
-
-        self.educationLevel = educationTypes_choice(educationTypes)
-        self.salaryRange = salaryRangeTypes_choice(salaryRangeTypes)
-        self.employmentStatus = employmentTypes_choice(employmentTypes)
-        self.martialStatus = relationshipStatusTypes_choice(relationshipStatusTypes)
-
 client = pymongo.MongoClient("localhost", 27017)
 db = client.get_database("datalake")
 
@@ -123,9 +103,10 @@ col.insert_many([
         'martialStatus': relationshipStatusTypes_choice(relationshipStatusTypes)
     } for i in range(100000)])
 
-col.update_many({
-    'disabilityTypes': {
-        '$count': {'$gt': 0}}
- }, { 'hasDisabilities': 'true'})
+# Update the has disabilities flag
+col.update_many(
+    { '$where': 'this.disabilityTypes.length > 0' },
+    { '$set': { 'hasDisabilities': 'true' } }
+)
 
 client.close()
