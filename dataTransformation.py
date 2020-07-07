@@ -1,11 +1,15 @@
 import os
+import re
+import asyncio
 from pathlib import Path
 
-import asyncio
-
-DATALAKE_HOME_DIR = os.environ.get("DATALAKE_HOME_DIR", './raw')
+DATALAKE_DB_NAME = os.environ.get('DATALAKE_DB_NAME', 'datalake')
+DATALAKE_HOME_DIR = os.environ.get('DATALAKE_HOME_DIR', './raw')
 SOURCE_DIRECTORY = Path(DATALAKE_HOME_DIR) 
 
+# 
+#
+#
 async def command(cmd):
     proc = await asyncio.create_subprocess_shell(
         cmd,
@@ -20,10 +24,19 @@ async def command(cmd):
     if stderr:
         print(f'[stderr]\n{stderr.decode()}')
 
-def transformCsvFile(path, name, ext) :
-    str = 'ls -l ' + path
-    asyncio.run(command(str))
+# Imports data from CSV file with mongoimports
+# #
+# path: absolute path with file and extension
+# name: csv file name
+# ext:  extention of file
+#
+# https://docs.mongodb.com/manual/reference/program/mongoimport/
+def transformCsvFile(path, file, extension) :
+    collection = re.sub(extension, '', file) # collection name
+    line = format('mongoimport --db=%s --collection=%s --type=csv --headerline --file=%s', 
+        DATALAKE_DB_NAME, collection, path)
 
+    asyncio.run(command(line))
 
 for item in SOURCE_DIRECTORY.iterdir():
     if item.is_dir() : continue # processing directory not allow yet
