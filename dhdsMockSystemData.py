@@ -88,10 +88,11 @@ educationTypes = ['High School Diploma/GED', 'Some College', 'Continuous Educati
 client = pymongo.MongoClient("localhost", 27017)
 db = client.get_database("datalake")
 
-col = db.get_collection("dsdh")
+col = db.get_collection("raw")
 col.insert_many([
     {
         '_id': str(uuid.uuid4()),
+        'source': 'dsdh',
         'disabilityTypes': disabilityTypes_sampler(disabilityTypes,random.randint(0,disabilityTypes_len)),
         'healthTypes': healthTypes_sampler(healthTypes,random.randint(0,healthTypes_len)),
         'gender': genderTypes_choice(genderTypes),
