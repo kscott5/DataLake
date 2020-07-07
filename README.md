@@ -29,3 +29,8 @@ docker exec -it mongo_dev bash
 ```
 mongoimport --db=datalake --collection=label_geography --type=csv --headerline --file= label_geography.csv
 ```
+
+
+### ABSOLUTELY conscious that Microsoft SSIS Extract Transform Load ETL is similar
+[Microsoft Azure DataLakes & Databricks](https://docs.microsoft.com/en-us/azure/databricks/scenarios/what-is-azure-databricks)  
+[Amazon AWS Databricks](https://aws.amazon.com/marketplace/pp/Databricks-Inc-Databricks-Unified-Analytics-Platfo/B07K2NJKRW)
