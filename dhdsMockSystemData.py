@@ -1,6 +1,6 @@
 import random
 import json
-
+import time
 import uuid
 import pymongo
 
@@ -26,6 +26,12 @@ healthTypes = [
     'Heart disease',
     'High blood pressure',
     'HIV',
+    'Religion Community Mental Health',
+    'LGBT Community Mental Health',
+    'Marketing Community Mental Health',
+    'Internet Community Mental Health',
+    'Comestic Surgery Community Mental Health',
+    'Political Community Mental Health',
     'Cancer'
     'Hashimoto',
     'Sicklecell',
@@ -85,14 +91,27 @@ relationshipStatusTypes = [
 educationTypes_choice = random.choice #Saves the choice([]) function for use later
 educationTypes = ['High School Diploma/GED', 'Some College', 'Continuous Education', 'Associate Degree', 'Bachelor Degree', 'Master Degree', 'PhD Degree', 'Certification(s)', 'Other']
 
+dsdhSourceType_choice = random.choice #Save choice([]) function for use later
+dsdhSourceTypes = [
+    'Internal Marketing Research',
+    'Corporate Sponsorship',
+    'Government Sponsorship',
+    'Partners Sponsor Data'
+]
+
 client = pymongo.MongoClient("localhost", 27017)
 db = client.get_database("datalake")
 
-col = db.get_collection("raw")
+col = db.get_collection("dsdh")
 col.insert_many([
     {
         '_id': str(uuid.uuid4()),
-        'source': 'dsdh',
+        'source': { 
+            'type': dsdhSourceType_choice(dsdhSourceTypes), 
+            'timestamp': time.time() , 
+            'version': '1.0',
+            'description': 'Disability and Health Data System'
+        },
         'disabilityTypes': disabilityTypes_sampler(disabilityTypes,random.randint(0,disabilityTypes_len)),
         'healthTypes': healthTypes_sampler(healthTypes,random.randint(0,healthTypes_len)),
         'gender': genderTypes_choice(genderTypes),
