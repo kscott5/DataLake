@@ -1,4 +1,17 @@
 FROM mongo
-RUN mongoimport --db test --collection inventory \
-          --authenticationDatabase admin --username <user> --password <password> \
-          --drop --file ~/Downloads/inventory.crud.json
+
+RUN apt-get update & apt-get install python3.7 asyncio 
+
+ENV DATALAKE_HOME_DIR='/home/datalake'
+ENV DATALAKE_IMPORT_DIR='${DATALAKE_HOME_DIR}/imports'
+ENV DATALAKE_SCRIPT_DIR='${DATALAKE_HOME_DIR}/scripts'
+
+VOLUME [ ${DATALAKE_IMPORT_DIR} ]
+
+RUN mkdir ${DATALAKE_HOME_DIR}
+RUN mkdir ${DATALAKE_SCRIPT_DIR}
+
+WORKDIR ${DATALAKE_SCRIPTS_DIR}
+COPY './dataTransformation.py', '.'
+
+ENTRYPOINT [ "python dataTransformation.py" ]
