@@ -1,3 +1,8 @@
+
+### ABSOLUTELY conscious that Microsoft SSIS Extract Transform Load ETL is similar
+[Microsoft Azure DataLakes & Databricks](https://docs.microsoft.com/en-us/azure/databricks/scenarios/what-is-azure-databricks)  
+[Amazon AWS Databricks](https://aws.amazon.com/marketplace/pp/Databricks-Inc-Databricks-Unified-Analytics-Platfo/B07K2NJKRW)
+
 # Data Lake Development Project
 A repository that helps me explore [Python](https://docs.python.org/3.7/index.html) [random](https://docs.python.org/3.7/library/random.html) module for generation of large development test data with specific function use. 
 
@@ -29,8 +34,3 @@ docker exec -it mongo_dev bash
 ```
 mongoimport --db=datalake --collection=label_geography --type=csv --headerline --file= label_geography.csv
 ```
-
-
-### ABSOLUTELY conscious that Microsoft SSIS Extract Transform Load ETL is similar
-[Microsoft Azure DataLakes & Databricks](https://docs.microsoft.com/en-us/azure/databricks/scenarios/what-is-azure-databricks)  
-[Amazon AWS Databricks](https://aws.amazon.com/marketplace/pp/Databricks-Inc-Databricks-Unified-Analytics-Platfo/B07K2NJKRW)
