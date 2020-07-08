@@ -17,9 +17,11 @@ eventScheduler = sched.scheduler(time.time, time.sleep)
 # 
 #
 #
-async def command(cmd):
+async def command(name, action):
+    print(f'\t\t\tCommand: {name}\taction: {action}')
+    
     proc = await asyncio.create_subprocess_shell(
-        cmd,
+        action,
         stdout=asyncio.subprocess.PIPE,
         stderr=asyncio.subprocess.PIPE)
 
@@ -27,14 +29,16 @@ async def command(cmd):
 
     result = {'isOk': True, 'code': '', 'message': '' }
 
-    result['code'] = f'[{cmd!r} exited with {proc.returncode}]'
+    result['code'] = f'[{name!r} exited with {proc.returncode}]'
+    print(f"{result['code']}")
+
     if stdout:
         result['message'] = f'[stdout]\n{stdout.decode()}'
         
     if stderr:
         result['isOk'] = False
         result['message'] = f'[stderr]\n{stderr.decode()}'
-
+    
     return result
 
 # Imports data from CSV file with mongoimports
@@ -44,15 +48,18 @@ async def command(cmd):
 # ext:  extention of file
 #
 # https://docs.mongodb.com/manual/reference/program/mongoimport/
-def transformCsvFile(path, file, extension) :
+async def transformCsvFile(path, file, extension) :
+    print(f'\t\tStart: transformCsvFile({file})')
     collection = re.sub(extension, '', file) # collection name
 
     # https://docs.python.org/3.7/tutorial/inputoutput.html
-    line = f'mongoimport  --uri={MONGO_DB_URI}/{DATALAKE_DB_NAME} --collection={collection} --type=csv --headerline --file={path}'
+    line = f'mongoimport  --uri={MONGO_DB_URI}/{DATALAKE_DB_NAME} --collection={collection} --type=csv --headerline --file={path}'    
+    results = await command('mongoimport', line)    
 
-    asyncio.run(command(line))
+    print('\t\tDone')
 
 def transformRawDataFiles():
+    print('\tStart: transformRawDataFiles()')
     for item in SOURCE_DIRECTORY.iterdir():
         if item.is_dir() : continue # processing directory not allow yet
         
@@ -60,14 +67,19 @@ def transformRawDataFiles():
         filename =  item.stem # returns file
         fileext = item.suffix # returns .ext
         
-        if fileext == '.csv' : transformCsvFile(abspath, filename, fileext)
+        if fileext == '.csv' : asyncio.run(transformCsvFile(abspath, filename, fileext))
         else : continue # file extension not allow yet
-         
+    
+    print('\tDone')
+
 # https://docs.python.org/3.7/library/__main__.html?highlight=__main__
 def main():
-    print("Main event scheduler for Data Transformation")
+    print('Main event scheduler for Data Transformation')
+
     eventScheduler.enter(60, 1, transformRawDataFiles)
     eventScheduler.run(True)
+
+    print('Done')
     
 if __name__ == "__main__":
     main()
