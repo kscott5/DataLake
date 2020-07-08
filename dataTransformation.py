@@ -11,8 +11,6 @@ DATALAKE_DB_NAME = os.environ.get('DATALAKE_DB_NAME', 'datalake')
 DATALAKE_HOME_DIR = os.environ.get('DATALAKE_HOME_DIR', './raw')
 SOURCE_DIRECTORY = Path(DATALAKE_HOME_DIR) 
 
-MONGO_IMPORT_LINE = 'mongoimport  --uri={0}/{1} --collection={2} --type=csv --headerline --file={3}'
-
 #Event scheduler
 eventScheduler = sched.scheduler(time.time, time.sleep)
 
@@ -27,11 +25,17 @@ async def command(cmd):
 
     stdout, stderr = await proc.communicate()
 
-    print(f'[{cmd!r} exited with {proc.returncode}]')
+    result = {'isOk': True, 'code': '', 'message': '' }
+
+    result['code'] = f'[{cmd!r} exited with {proc.returncode}]'
     if stdout:
-        print(f'[stdout]\n{stdout.decode()}')        
+        result['message'] = f'[stdout]\n{stdout.decode()}'
+        
     if stderr:
-        print(f'[stderr]\n{stderr.decode()}')
+        result['isOk'] = False
+        result['message'] = f'[stderr]\n{stderr.decode()}'
+
+    return result
 
 # Imports data from CSV file with mongoimports
 # #
@@ -42,7 +46,9 @@ async def command(cmd):
 # https://docs.mongodb.com/manual/reference/program/mongoimport/
 def transformCsvFile(path, file, extension) :
     collection = re.sub(extension, '', file) # collection name
-    line = MONGO_IMPORT_LINE.format(MONGO_DB_URI, DATALAKE_DB_NAME, collection, path)
+
+    # https://docs.python.org/3.7/tutorial/inputoutput.html
+    line = f'mongoimport  --uri={MONGO_DB_URI}/{DATALAKE_DB_NAME} --collection={collection} --type=csv --headerline --file={path}'
 
     asyncio.run(command(line))
 
