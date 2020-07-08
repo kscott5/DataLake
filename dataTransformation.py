@@ -38,15 +38,21 @@ def transformCsvFile(path, file, extension) :
 
     asyncio.run(command(line))
 
-for item in SOURCE_DIRECTORY.iterdir():
-    if item.is_dir() : continue # processing directory not allow yet
-    
-    abspath = os.path.abspath(item) # returns /home/user/file.ext
-    filename =  item.stem # returns file
-    fileext = item.suffix # returns .ext
-    
-    if fileext == '.csv' : transformCsvFile(abspath, filename, fileext)
-    else : continue # file extension not allow yet
+
+def readFileSystem():
+    for item in SOURCE_DIRECTORY.iterdir():
+        if item.is_dir() : continue # processing directory not allow yet
+        
+        abspath = os.path.abspath(item) # returns /home/user/file.ext
+        filename =  item.stem # returns file
+        fileext = item.suffix # returns .ext
+        
+        if fileext == '.csv' : transformCsvFile(abspath, filename, fileext)
+        else : continue # file extension not allow yet
          
+# https://docs.python.org/3.7/library/__main__.html?highlight=__main__
+def main():
+    print("Main event scheduler for Data TRansformation")
 
-
+if __name__ == "__main__":
+    main()
