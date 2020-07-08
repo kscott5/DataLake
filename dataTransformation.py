@@ -18,7 +18,7 @@ eventScheduler = sched.scheduler(time.time, time.sleep)
 #
 #
 async def command(name, action):
-    print(f'\t\t\tCommand: {name}\taction: {action}')
+    print(f'Command: {name}action: {action}')
     
     proc = await asyncio.create_subprocess_shell(
         action,
@@ -27,19 +27,16 @@ async def command(name, action):
 
     stdout, stderr = await proc.communicate()
 
-    result = {'isOk': True, 'code': '', 'message': '' }
-
-    result['code'] = f'[{name!r} exited with {proc.returncode}]'
-    print(f"{result['code']}")
+    results = {'isOk': proc.returncode == 0, 'code': '', 'message': '' }
+    results['code'] = f'[{name!r} exited with {proc.returncode}]'
+    print(f"{results['code']}")
 
     if stdout:
-        result['message'] = f'[stdout]\n{stdout.decode()}'
-        
-    if stderr:
-        result['isOk'] = False
-        result['message'] = f'[stderr]\n{stderr.decode()}'
+        results['message'] = f'[stdout]\n{stdout.decode()}'
+    elif stderr:
+        results['message'] = f'[stderr]\n{stderr.decode()}'
     
-    return result
+    return results
 
 # Imports data from CSV file with mongoimports
 # #
@@ -49,17 +46,20 @@ async def command(name, action):
 #
 # https://docs.mongodb.com/manual/reference/program/mongoimport/
 async def transformCsvFile(path, file, extension) :
-    print(f'\t\tStart: transformCsvFile({file})')
+    print(f'Start: transformCsvFile({file})')
     collection = re.sub(extension, '', file) # collection name
 
     # https://docs.python.org/3.7/tutorial/inputoutput.html
     line = f'mongoimport  --uri={MONGO_DB_URI}/{DATALAKE_DB_NAME} --collection={collection} --type=csv --headerline --file={path}'    
     results = await command('mongoimport', line)    
 
-    print('\t\tDone')
+    if results['isOk'] :
+        Path(path).rename(path.replace(extension, f'{extension}.{time.time()}'))
+
+    print('Done')
 
 def transformRawDataFiles():
-    print('\tStart: transformRawDataFiles()')
+    print('Start: transformRawDataFiles()')
     for item in SOURCE_DIRECTORY.iterdir():
         if item.is_dir() : continue # processing directory not allow yet
         
@@ -70,7 +70,7 @@ def transformRawDataFiles():
         if fileext == '.csv' : asyncio.run(transformCsvFile(abspath, filename, fileext))
         else : continue # file extension not allow yet
     
-    print('\tDone')
+    print('Done')
 
 # https://docs.python.org/3.7/library/__main__.html?highlight=__main__
 def main():
