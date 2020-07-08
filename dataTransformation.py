@@ -29,7 +29,7 @@ async def command(cmd):
 
     print(f'[{cmd!r} exited with {proc.returncode}]')
     if stdout:
-        print(f'[stdout]\n{stdout.decode()}')
+        print(f'[stdout]\n{stdout.decode()}')        
     if stderr:
         print(f'[stderr]\n{stderr.decode()}')
 
@@ -60,8 +60,8 @@ def transformRawDataFiles():
 # https://docs.python.org/3.7/library/__main__.html?highlight=__main__
 def main():
     print("Main event scheduler for Data Transformation")
-    eventScheduler.enter(300, 1, transformRawDataFiles)
-    eventScheduler.run(False)
+    eventScheduler.enter(60, 1, transformRawDataFiles)
+    eventScheduler.run(True)
     
 if __name__ == "__main__":
     main()
