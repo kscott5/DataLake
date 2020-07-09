@@ -56,8 +56,6 @@ async def transformCsvFile(path, file, extension) :
     if results['isOk'] :
         Path(path).rename(path.replace(extension, f'{extension}.{time.time()}'))
 
-    print('Done')
-
 def transformRawDataFiles():
     print('Start: transformRawDataFiles()')
     for item in SOURCE_DIRECTORY.iterdir():
@@ -79,7 +77,7 @@ def main():
     eventScheduler.enter(60, 1, transformRawDataFiles)
     eventScheduler.run(True)
 
-    print('Done')
+    print('Main event scheduler for Data Transformation complete for now')
     
 if __name__ == "__main__":
     main()
