@@ -18,7 +18,7 @@ eventScheduler = sched.scheduler(time.time, time.sleep)
 #
 #
 async def command(name, action):
-    print(f'Command: {name}action: {action}')
+    print(f'Command: [{name}]:\taction: {action}')
     
     proc = await asyncio.create_subprocess_shell(
         action,
@@ -46,7 +46,7 @@ async def command(name, action):
 #
 # https://docs.mongodb.com/manual/reference/program/mongoimport/
 async def loadCsvData(path, file, extension) :
-    print(f'Start: transformCsvFile({file})')
+    print(f'Start: loadCsvData({file})')
     collection = re.sub(extension, '', file) # collection name
 
     # https://docs.python.org/3.7/tutorial/inputoutput.html
@@ -57,7 +57,7 @@ async def loadCsvData(path, file, extension) :
         Path(path).rename(path.replace(extension, f'{extension}.{time.time()}'))
 
 def loadRawDataFiles():
-    print('Start: transformRawDataFiles()')
+    print('Start: loadRawDataFiles()')
     for item in SOURCE_DIRECTORY.iterdir():
         if item.is_dir() : continue # processing directory not allow yet
         
