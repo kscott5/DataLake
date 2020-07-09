@@ -45,7 +45,7 @@ async def command(name, action):
 # ext:  extention of file
 #
 # https://docs.mongodb.com/manual/reference/program/mongoimport/
-async def transformCsvFile(path, file, extension) :
+async def loadCsvData(path, file, extension) :
     print(f'Start: transformCsvFile({file})')
     collection = re.sub(extension, '', file) # collection name
 
@@ -56,7 +56,7 @@ async def transformCsvFile(path, file, extension) :
     if results['isOk'] :
         Path(path).rename(path.replace(extension, f'{extension}.{time.time()}'))
 
-def transformRawDataFiles():
+def loadRawDataFiles():
     print('Start: transformRawDataFiles()')
     for item in SOURCE_DIRECTORY.iterdir():
         if item.is_dir() : continue # processing directory not allow yet
@@ -65,7 +65,7 @@ def transformRawDataFiles():
         filename =  item.stem # returns file
         fileext = item.suffix # returns .ext
         
-        if fileext == '.csv' : asyncio.run(transformCsvFile(abspath, filename, fileext))
+        if fileext == '.csv' : asyncio.run(loadCsvData(abspath, filename, fileext))
         else : continue # file extension not allow yet
     
     print('Done')
@@ -74,7 +74,7 @@ def transformRawDataFiles():
 def main():
     print('Main event scheduler for Data Transformation')
 
-    eventScheduler.enter(60, 1, transformRawDataFiles)
+    eventScheduler.enter(60, 1, loadRawDataFiles)
     eventScheduler.run(True)
 
     print('Main event scheduler for Data Transformation complete for now')
