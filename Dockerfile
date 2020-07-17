@@ -13,14 +13,17 @@ RUN echo "deb http://repo.mongodb.org/apt/debian stretch/mongodb-org/4.2 main" |
 #
 # NOTE: Installation of python 2.5, 3 and 3.5 exist wtih kernel but 
 # does not support Blake2b encryption alogrithm.
+# NOTE: This is not the recommendation of https://packaging.python.org/tutorials/
 RUN apt-get update 
-RUN apt-get install -y mongodb-org-tools python3.7
+RUN apt-get install -y mongodb-org-tools python3.7 pipenv
 
 # Update the python symbolic links
 RUN rm /usr/bin/python & ln /usr/bin/python3.7 /usr/bin/python
 
 # Install python package manager and application dependencies
-RUN python /home/get-pip.py & python -m pip install blake2b pymongo
+# 
+# NOTE: This is not the recommendation of https://packaging.python.org/tutorials/
+RUN python /home/get-pip.py & python -m pip install pipenv blake2b pymongo
 
 # Define an entry access point
 COPY docker-entrypoint.sh /usr/local/bin
