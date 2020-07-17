@@ -3,7 +3,7 @@ FROM node:14.5.0-alpine
 
 # Python Install Package Manager Script
 COPY get-pip.py /home/get-pip.py
-COPY ./dist/** /home
+COPY ./dist/* /home
 
 # MongoDB APT Manager source keys
 RUN wget -qO - https://www.mongodb.org/static/pgp/server-4.2.asc | apt-key add -
