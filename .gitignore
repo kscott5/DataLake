@@ -145,3 +145,5 @@ cython_debug/
 
 *.log
 /dist
+yarn.lock
+/node_modules

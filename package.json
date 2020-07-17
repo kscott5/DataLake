@@ -1,5 +1,5 @@
 {
-  "name": "Data Lake",
+  "name": "DataLake",
   "version": "1.0.0",
   "description": "Python data loading scripts",
   "main": "index.js",
