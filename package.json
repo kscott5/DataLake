@@ -1,0 +1,9 @@
+{
+  "name": "Data Lake",
+  "version": "1.0.0",
+  "description": "Python data loading scripts",
+  "main": "index.js",
+  "repository": "https://github.com/kscott5/datalake.git",
+  "author": "Karega K. Scott <kkscott@outlook.com>",
+  "license": "GPL-3.0-or-later"
+}
