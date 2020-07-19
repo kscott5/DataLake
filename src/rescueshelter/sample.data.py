@@ -96,7 +96,7 @@ def loadAnimalTestData() :
             },
             'category': animalCategoryType_choice(animalCategoryTypes),
             'endangered': endangeredTypes_choice(endangeredTypes),
-            'population': populationData(population_generator(size_min,size_max)),
+            'data': populationData(population_generator(size_min,size_max)),
             'dates': {
                 'created': datetime.datetime.utcnow(),
                 'modified': datetime.datetime.utcnow()
