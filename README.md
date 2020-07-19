@@ -21,6 +21,14 @@ A repository that helps me explore [Python](https://docs.python.org/3.7/index.ht
 [Robo3t](https://www.robomongo.org/)  
 [Markdown Guide](https://guides.github.com/features/mastering-markdown/)  
 
+## [Invoke](http://docs.pyinvoke.org/en/stable/getting-started.html)
+Invoke is python task runner. It has similar functions found with yarn, npm or dotnet SDK project manager. Use requires tasks 
+are defined with a default tasks.py or similar .py script files.
+
+```
+python -m pip invoke
+python invoke --list
+```
 
 ## NOTE: Dockerfile configuration manual at the moment
 ``` shell
