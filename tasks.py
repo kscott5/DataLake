@@ -1,3 +1,4 @@
+import os
 from invoke import task, run, Collection
 from pathlib import Path
 
@@ -18,5 +19,5 @@ def build(context):
 
 @task
 def mongo(context):
-    run('docker run -p 27017:27017 --volume ./:/home/datalake --name mongo_dev mongo mongod')
+    run(f'docker run -d -p 27017:27017 --volume {os.getcwd()}:/home/datalake --name mongo_dev mongo mongod')
 
