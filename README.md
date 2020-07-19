@@ -27,7 +27,7 @@ are defined with a default tasks.py or similar .py script files.
 
 ```
 python -m pip invoke
-python invoke --list
+python -m invoke --list
 ```
 
 ### [Build and Distribution Python](https://setuptools.readthedocs.io/en/latest/setuptools.html#developer-s-guide)
