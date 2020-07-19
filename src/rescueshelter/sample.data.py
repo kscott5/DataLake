@@ -58,9 +58,7 @@ def loadSponsorTestData() :
 
 def loadAnimalTestData() :
     print('Loading sample animal data')
-
     starttime = datetime.datetime.now()
-    print(f'\tStart time: {starttime.time()}')
 
     animalImageIconType_choice = random.choice
     animalImageIconTypes = ['deskpro', 'docker', 'earlybirds', 'drupal', 'firefox',
@@ -98,8 +96,7 @@ def loadAnimalTestData() :
             },
             'category': animalCategoryType_choice(animalCategoryTypes),
             'endangered': endangeredTypes_choice(endangeredTypes),
-            'population': population_generator(size_min,size_max),
-            'populations': populationData(population_generator(size_min,size_max)),
+            'population': populationData(population_generator(size_min,size_max)),
             'dates': {
                 'created': datetime.datetime.utcnow(),
                 'modified': datetime.datetime.utcnow()
@@ -110,7 +107,7 @@ def loadAnimalTestData() :
     client.close()
 
     endtime = datetime.datetime.now()
-    print(f'\tDuration: {endtime-starttime}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     ')
+    print(f'Duration: {endtime-starttime}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     ')
 
 def populationData(populationToday):
     delta = datetime.timedelta(days=-270)
