@@ -30,6 +30,11 @@ python -m pip invoke
 python invoke --list
 ```
 
+### [Build and Distribution Python](https://setuptools.readthedocs.io/en/latest/setuptools.html#developer-s-guide)
+```
+python setup.py --help
+```
+
 ## NOTE: Dockerfile configuration manual at the moment
 ``` shell
 docker run -p 27017:27017 --volume ~/apps/pyapps/datalake:/home/datalake --name mongo_dev mongo mongod
