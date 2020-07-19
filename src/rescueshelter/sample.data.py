@@ -59,6 +59,9 @@ def loadSponsorTestData() :
 def loadAnimalTestData() :
     print('Loading sample animal data')
 
+    starttime = datetime.datetime.now()
+    print(f'\tStart time: {starttime.time()}')
+
     animalImageIconType_choice = random.choice
     animalImageIconTypes = ['deskpro', 'docker', 'earlybirds', 'drupal', 'firefox',
         'github', 'gitlab', 'grunt', 'linux', 'napster', 'phoenix framework', 'qq',
@@ -96,6 +99,7 @@ def loadAnimalTestData() :
             'category': animalCategoryType_choice(animalCategoryTypes),
             'endangered': endangeredTypes_choice(endangeredTypes),
             'population': population_generator(size_min,size_max),
+            'populations': populationData(population_generator(size_min,size_max)),
             'dates': {
                 'created': datetime.datetime.utcnow(),
                 'modified': datetime.datetime.utcnow()
@@ -104,6 +108,27 @@ def loadAnimalTestData() :
         } for i in range(100000)])
 
     client.close()
+
+    endtime = datetime.datetime.now()
+    print(f'\tDuration: {endtime-starttime}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     ')
+
+def populationData(populationToday):
+    delta = datetime.timedelta(days=-270)
+    utcnow = datetime.datetime.utcnow()
+    population = populationToday
+
+    data = []
+    for i in range(100) :
+        if i >= 1 : # entry
+            utcnow = utcnow+delta 
+            population = random.randint(100, 200)
+
+        data.append({
+            'population': population,
+            'created': utcnow
+        })
+
+    return data
 
 def main() :
     loadSponsorTestData()
