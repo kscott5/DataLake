@@ -18,12 +18,12 @@ wordTemplate =  'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
 # https://docs.python.org/3.7/library/hashlib.html?highlight=blake#hashlib.blake2b
 # https://www.npmjs.com/package/blake2
 def encryptedData(data, key = 'Rescue Shelter: Security Question Answer') :
-        tmpData = data.strip().encode('utf-16')
-        tmpKey = key.strip().encode('utf-16')
+    tmpData = data.strip().encode('utf-8')
+    tmpKey = key.strip().encode('utf-8')
 
-        fn = blake2b(digest_size=16, key=tmpKey)
-        fn.update(tmpData)
-        return fn.hexdigest()
+    fn = blake2b(digest_size=16, key=tmpKey)
+    fn.update(tmpData)
+    return fn.hexdigest()
 
 def verifyEncryptedData() :
     print('Verify sponsor sample password data')
@@ -49,7 +49,7 @@ def loadSponsorTestData() :
             'useremail': f'{firstname}.{lastname}@rescueshelter.co',
             'photo': '',
             'security': {
-                'password': encryptedData(data='#P@ssw0rd1.', key=f'{firstname}.{lastname}')
+                'password': encryptedData(data='#P@ssw0rd1.', key=f'{firstname}.{lastname}@rescueshelter.co')
             },
             'audit': []
         })
