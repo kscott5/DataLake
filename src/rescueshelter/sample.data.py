@@ -9,7 +9,7 @@ import pymongo
 from hashlib import blake2b # Python 3.6
 
 # https://docs.python.org/3.6/library/multiprocessing.html#module-multiprocessing
-from multiprocessing import Pool, AsynResult
+from multiprocessing import Pool, AsyncResult
 def startMulticoreProcessFor(function, args, message  = 'Multiple core processor function evaluation') :
     print(message)
     starttime = datetime.datetime.now()
