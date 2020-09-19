@@ -8,6 +8,24 @@ import pymongo
 # PEP 498 introduces a new kind of string literals: f-strings, or formatted string literals.
 from hashlib import blake2b # Python 3.6
 
+# https://docs.python.org/3.6/library/multiprocessing.html#module-multiprocessing
+from multiprocessing import Pool, AsynResult
+def startMulticoreProcessFor(function, args, message  = 'Multiple core processor function evaluation') :
+    print(message)
+    starttime = datetime.datetime.now()
+
+    with Pool(processes=4) as pool :         
+        # launching multiple evaluations asynchronously *may* use more processes
+        asyncResults = [pool.apply_async(target=function, args=args) for i in range(4)]
+        
+    while True :
+        # Create a list of asyncResults ready state values
+        if False in [asyncResult.ready() for asyncResult in asyncResults] : continue # A function execution not complete
+        else : break
+
+    endtime = datetime.datetime.now()    
+    print(f'Duration: {endtime-starttime}')
+
 word_size_min = 5
 word_size_max = 10
 wordSize = random.randint(word_size_min, word_size_max)
@@ -34,7 +52,7 @@ def loadSponsorTestData() :
     client = pymongo.MongoClient("localhost", 27017)
     db = client.get_database("rescueshelter")
 
-    db.drop_collection("sponsors")
+    #db.drop_collection("sponsors")
     col = db.get_collection("sponsors")
 
     print('Use #P@ssw0rd1. with these available email:')
@@ -56,7 +74,8 @@ def loadSponsorTestData() :
 
     client.close()
 
-def loadAnimalTestData() :
+
+def loadAnimalTestData(insert_count=100000) :
     print('Loading sample animal data')
     starttime = datetime.datetime.now()
 
@@ -84,7 +103,7 @@ def loadAnimalTestData() :
     client = pymongo.MongoClient("localhost", 27017)
     db = client.get_database("rescueshelter")
 
-    db.drop_collection("animals")
+    # db.drop_collection("animals")
     col = db.get_collection("animals")
     col.insert_many([
         {
@@ -102,12 +121,12 @@ def loadAnimalTestData() :
                 'modified': datetime.datetime.utcnow()
             },
             'sponsors': []
-        } for i in range(100000)])
-
+        } for i in range(insert_count)])
+    
     client.close()
 
     endtime = datetime.datetime.now()
-    print(f'Duration: {endtime-starttime}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     ')
+    print(f'Duration: {endtime-starttime}')
 
 def populationData(populationToday):
     delta = datetime.timedelta(days=-270)
@@ -129,7 +148,8 @@ def populationData(populationToday):
 
 def main() :
     loadSponsorTestData()
-    loadAnimalTestData()
+    #loadAnimalTestData(100000)
+    startMulticoreProcessFor(loadAnimalTestData,(50000), 'loading animal test data')
 
 if __name__ == "__main__":
     main()
