@@ -9,19 +9,22 @@ import pymongo
 from hashlib import blake2b # Python 3.6
 
 # https://docs.python.org/3.6/library/multiprocessing.html#module-multiprocessing
-from multiprocessing import Pool, AsyncResult
-def startMulticoreProcessFor(function, args, message  = 'Multiple core processor function evaluation') :
+from multiprocessing import Pool
+from multiprocessing.pool import AsyncResult
+import typing
+
+def startMulticoreProcessFor(function, args: typing.Iterable[typing.Any], message  = 'Multiple core processor function evaluation') :
     print(message)
     starttime = datetime.datetime.now()
 
     with Pool(processes=4) as pool :         
         # launching multiple evaluations asynchronously *may* use more processes
-        asyncResults = [pool.apply_async(target=function, args=args) for i in range(4)]
+        asyncResults = [pool.apply_async(func=function, args=args) for i in range(4)]
         
-    while True :
-        # Create a list of asyncResults ready state values
-        if False in [asyncResult.ready() for asyncResult in asyncResults] : continue # A function execution not complete
-        else : break
+        while True :
+            # Create a list of asyncResults ready state values
+            if False in [asyncResult.ready() for asyncResult in asyncResults] : continue # A function execution not complete
+            else : break
 
     endtime = datetime.datetime.now()    
     print(f'Duration: {endtime-starttime}')
@@ -149,7 +152,7 @@ def populationData(populationToday):
 def main() :
     loadSponsorTestData()
     #loadAnimalTestData(100000)
-    startMulticoreProcessFor(loadAnimalTestData,(50000), 'loading animal test data')
+    startMulticoreProcessFor(loadAnimalTestData, [50000,], 'loading animal test data')
 
 if __name__ == "__main__":
     main()
