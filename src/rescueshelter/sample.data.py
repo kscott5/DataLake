@@ -20,7 +20,7 @@ def bulkWriteListSizes(totalWrites: int = 1000000) :
     last_batch_size = totalWrites % CHUCK_SIZE
 
     # Total number of batches for bulk write operation
-    batch_count = totalWrites - (last_batch_size)
+    batch_count = (totalWrites - (last_batch_size)) // CHUCK_SIZE
 
     # Initial list with size of each bulk write operation
     results = [CHUCK_SIZE for count in range( batch_count )]
