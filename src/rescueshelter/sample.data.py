@@ -11,9 +11,26 @@ from hashlib import blake2b # Python 3.6
 # https://docs.python.org/3.6/library/multiprocessing.html#module-multiprocessing
 from multiprocessing import Pool
 from multiprocessing.pool import AsyncResult
-import typing
+from typing import Iterable, Any
 
-def startMulticoreProcessFor(function, args: typing.Iterable[typing.Any], message  = 'Multiple core processor function evaluation') :
+def bulkWriteListSizes(totalWrites: int = 1000000) : 
+    CHUCK_SIZE = 1024 # History: Bytes in 1 Kilobyte
+
+    # Total number of inserts in last bulk write operation
+    last_batch_size = totalWrites % CHUCK_SIZE
+
+    # Total number of batches for bulk write operation
+    batch_count = totalWrites - (last_batch_size)
+
+    # Initial list with size of each bulk write operation
+    results = [CHUCK_SIZE for count in range( batch_count )]
+
+    if last_batch_size > 0 : results.append(last_batch_size)
+    if sum(results) == totalWrites : return results
+
+    return [0]
+
+def startMulticoreProcessFor(function, args: Iterable[Any], message  = 'Multiple core processor function evaluation') :
     print(message)
     starttime = datetime.datetime.now()
 
@@ -23,7 +40,7 @@ def startMulticoreProcessFor(function, args: typing.Iterable[typing.Any], messag
         
         while True :
             # Create a list of asyncResults ready state values
-            if False in [asyncResult.ready() for asyncResult in asyncResults] : continue # A function execution not complete
+            if False in [asyncResult.ready() for asyncResult in asyncResults] : continue # One function execution is not complete
             else : break
 
     endtime = datetime.datetime.now()    
@@ -64,6 +81,7 @@ def loadSponsorTestData() :
         lastname = ''.join(word_generator(wordTemplate,wordSize))
 
         print(f'\t{firstname}.{lastname}@rescueshelter.co')
+        col.b
         col.insert_one({
             'firstname': firstname,
             'lastname': lastname,
