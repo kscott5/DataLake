@@ -39,6 +39,8 @@ def startMulticoreProcessFor(function, args: Iterable[Any], message  = 'Multiple
         asyncResults = [pool.apply_async(func=function, args=args) for i in range(4)]
         
         while True :
+            for asyncResult in asyncResults :  asyncResult.wait(1)
+
             # Create a list of asyncResults ready state values
             if False in [asyncResult.ready() for asyncResult in asyncResults] : continue # One function execution is not complete
             else : break
@@ -95,31 +97,69 @@ def loadSponsorTestData() :
 
     client.close()
 
+animalImageIconType_choice = random.choice
+animalImageIconTypes = ['deskpro', 'docker', 'earlybirds', 'drupal', 'firefox',
+    'github', 'gitlab', 'grunt', 'linux', 'napster', 'phoenix framework', 'qq',
+    'reddit alien', 'snapchat ghost', 'sticker mule', 'twitter', 'tripadvisor',
+    'vaadin', 'themeisle', 'github alternate']
 
-def loadAnimalTestData(insert_count=100000) :
+animalCategoryType_choice = random.choice
+animalCategoryTypes = ['fishes', 'amphibians', 'reptiles', 'birds', 'mammals', 'invertebrates']
+
+endangeredTypes_choice = random.choice #Saves the choice([]) function for use later
+endangeredTypes = [ True, False]
+
+size_min = 100
+size_max = 500
+population_generator = random.randint #Saves the randint(min,max) function for use later
+
+description = '''Lorem ipsum dōlor sit ǽmet, reqūe tation constiÞuto vis eu, est ðōlor omnīum āntiopæm ei. 
+                Zril domīng cū eam, hās ið equīðem explīcærī voluptǽtum. Iusto regiōnē partiendo meǣ ne, vim 
+                cu ælii āltērum vōlutpāt, vis et aliquip trītæni. Dolor luptātum sapienÞem cu pēr, dico qūæs 
+                ðissentiǣs et eūm, vix ut.'''
+
+def bulkLoadAnimalTestData(insert_count: int = 100000) :
+    print('Loading sample animal data')    
+
+    client = pymongo.MongoClient("localhost", 27017)
+    db = client.get_database("rescueshelter")
+
+    # db.drop_collection("animals")    
+
+    batches = bulkWriteListSizes(insert_count)
+    for batch_size in batches :
+        starttime = datetime.datetime.now()
+        col = db.get_collection("animals")
+
+        col.bulk_write([
+            {
+                'insertOn': {            
+                    'name': ''.join(word_generator(wordTemplate, wordSize)),
+                    'description': description,
+                    'image': { 
+                        'content': animalImageIconType_choice(animalImageIconTypes),
+                        'contenttype': 'icon'
+                    },
+                    'category': animalCategoryType_choice(animalCategoryTypes),
+                    'endangered': endangeredTypes_choice(endangeredTypes),
+                    'data': populationData(population_generator(size_min,size_max)),
+                    'dates': {
+                        'created': datetime.datetime.utcnow(),
+                        'modified': datetime.datetime.utcnow()
+                    },
+                    'sponsors': []
+                } 
+            }
+            for i in range(batch_size)], ordered=False)            
+    
+        client.close()
+
+        endtime = datetime.datetime.now()
+        print(f'Duration: {endtime-starttime}')
+
+def loadAnimalTestData(insert_count: int = 100000) :
     print('Loading sample animal data')
     starttime = datetime.datetime.now()
-
-    animalImageIconType_choice = random.choice
-    animalImageIconTypes = ['deskpro', 'docker', 'earlybirds', 'drupal', 'firefox',
-        'github', 'gitlab', 'grunt', 'linux', 'napster', 'phoenix framework', 'qq',
-        'reddit alien', 'snapchat ghost', 'sticker mule', 'twitter', 'tripadvisor',
-        'vaadin', 'themeisle', 'github alternate']
-
-    animalCategoryType_choice = random.choice
-    animalCategoryTypes = ['fishes', 'amphibians', 'reptiles', 'birds', 'mammals', 'invertebrates']
-
-    endangeredTypes_choice = random.choice #Saves the choice([]) function for use later
-    endangeredTypes = [ True, False]
-
-    size_min = 100
-    size_max = 500
-    population_generator = random.randint #Saves the randint(min,max) function for use later
-
-    description = '''Lorem ipsum dōlor sit ǽmet, reqūe tation constiÞuto vis eu, est ðōlor omnīum āntiopæm ei. 
-                    Zril domīng cū eam, hās ið equīðem explīcærī voluptǽtum. Iusto regiōnē partiendo meǣ ne, vim 
-                    cu ælii āltērum vōlutpāt, vis et aliquip trītæni. Dolor luptātum sapienÞem cu pēr, dico qūæs 
-                    ðissentiǣs et eūm, vix ut.'''
 
     client = pymongo.MongoClient("localhost", 27017)
     db = client.get_database("rescueshelter")
@@ -170,7 +210,7 @@ def populationData(populationToday):
 def main() :
     loadSponsorTestData()
     #loadAnimalTestData(100000)
-    startMulticoreProcessFor(loadAnimalTestData, [50000,], 'loading animal test data')
+    startMulticoreProcessFor(bulkLoadAnimalTestData, [100000,], 'loading animal test data with bulk write')
 
 if __name__ == "__main__":
     main()
