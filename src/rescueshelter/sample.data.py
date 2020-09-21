@@ -133,7 +133,7 @@ def bulkLoadAnimalTestData(insert_count: int = 100000) :
 
         col.bulk_write([
             {
-                'insertOn': {            
+                'insertOne': {            
                     'name': ''.join(word_generator(wordTemplate, wordSize)),
                     'description': description,
                     'image': { 
