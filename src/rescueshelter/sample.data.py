@@ -184,7 +184,7 @@ def loadAnimalTestData(insert_count: int = 100000) :
                     'modified': datetime.datetime.utcnow()
                 },
                 'sponsors': []
-            } for i in range(batch_size)])
+            } for i in range(batch_size)], ordered=False)
     
     client.close()
 
