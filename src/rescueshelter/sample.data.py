@@ -1,6 +1,6 @@
 import random
 import datetime
-import pymongo
+from pymongo import MongoClient, Database, Collection, InsertOne
 
 # Python 3.7 in use.
 # Python 3.6 minimal requirement
@@ -92,7 +92,7 @@ def verifyEncryptedData() :
 def loadSponsorTestData() :
     print('Loading sponsor sample data')
 
-    client = pymongo.MongoClient("localhost", 27017)
+    client = MongoClient("localhost", 27017)
     db = client.get_database("rescueshelter")
 
     #db.drop_collection("sponsors")
@@ -121,7 +121,7 @@ def loadSponsorTestData() :
 def bulkLoadAnimalTestData(insert_count: int = 100000) :
     print('Loading sample animal data')    
 
-    client = pymongo.MongoClient("localhost", 27017)
+    client = MongoClient("localhost", 27017)
     db = client.get_database("rescueshelter")
 
     # db.drop_collection("animals")    
@@ -132,8 +132,7 @@ def bulkLoadAnimalTestData(insert_count: int = 100000) :
         starttime = datetime.datetime.now()
         
         col.bulk_write([
-            {
-                'insertOne': {            
+            InsertOne({            
                     'name': ''.join(word_generator(wordTemplate, wordSize)),
                     'description': description,
                     'image': { 
@@ -148,8 +147,7 @@ def bulkLoadAnimalTestData(insert_count: int = 100000) :
                         'modified': datetime.datetime.utcnow()
                     },
                     'sponsors': []
-                } 
-            }
+            }) 
             for i in range(batch_size)], ordered=False)            
         
         endtime = datetime.datetime.now()
@@ -164,7 +162,7 @@ def loadAnimalTestData(insert_count: int = 100000) :
 
     batches = bulkWriteListSizes(insert_count)
 
-    client = pymongo.MongoClient("localhost", 27017)
+    client = MongoClient("localhost", 27017)
     db = client.get_database("rescueshelter")
 
     # db.drop_collection("animals")
@@ -212,7 +210,7 @@ def startMulticoreProcessFor(function, args: Iterable[Any], message  = 'Multiple
 
 def main() :
     loadSponsorTestData()
-    loadAnimalTestData(100000)
+    loadAnimalTestData(100000000)
     #startMulticoreProcessFor(bulkLoadAnimalTestData, [100000,], 'loading animal test data with bulk write')
 
 if __name__ == "__main__":
