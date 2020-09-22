@@ -2,6 +2,8 @@ import random
 import datetime
 from pymongo import MongoClient, Database, Collection, InsertOne
 
+connectionString = "mongodb://192.168.43.136:27017"
+
 # Python 3.7 in use.
 # Python 3.6 minimal requirement
 #
@@ -86,13 +88,10 @@ def encryptedData(data, key = 'Rescue Shelter: Security Question Answer') :
     fn.update(tmpData)
     return fn.hexdigest()
 
-def verifyEncryptedData() :
-    print('Verify sponsor sample password data')
-
 def loadSponsorTestData() :
     print('Loading sponsor sample data')
 
-    client = MongoClient("localhost", 27017)
+    client = MongoClient(connectionString)
     db = client.get_database("rescueshelter")
 
     #db.drop_collection("sponsors")
@@ -121,7 +120,7 @@ def loadSponsorTestData() :
 def bulkLoadAnimalTestData(insert_count: int = 100000) :
     print('Loading sample animal data')    
 
-    client = MongoClient("localhost", 27017)
+    client = MongoClient(connectionString)
     db = client.get_database("rescueshelter")
 
     # db.drop_collection("animals")    
@@ -162,7 +161,7 @@ def loadAnimalTestData(insert_count: int = 100000) :
 
     batches = bulkWriteListSizes(insert_count)
 
-    client = MongoClient("localhost", 27017)
+    client = MongoClient(connectionString)
     db = client.get_database("rescueshelter")
 
     # db.drop_collection("animals")
