@@ -1,8 +1,11 @@
 import random
 import datetime
-from pymongo import MongoClient, Database, Collection, InsertOne
+from pymongo import MongoClient
+from pymongo.database import Database
+from pymongo.collection import Collection
+from pymongo.operations import InsertOne
 
-connectionString = "mongodb://192.168.43.136:27017"
+connectionString = "mongodb://192.168.43.5:27017"
 
 # Python 3.7 in use.
 # Python 3.6 minimal requirement
@@ -209,7 +212,7 @@ def startMulticoreProcessFor(function, args: Iterable[Any], message  = 'Multiple
 
 def main() :
     loadSponsorTestData()
-    loadAnimalTestData(100000000)
+    loadAnimalTestData(1000000) #oops not 100 Million, 100000000
     #startMulticoreProcessFor(bulkLoadAnimalTestData, [100000,], 'loading animal test data with bulk write')
 
 if __name__ == "__main__":
