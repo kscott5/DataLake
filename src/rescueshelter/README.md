@@ -8,7 +8,7 @@ The instruction for shard deployment are at [https://docs.mongodb.com/manual/tut
 ```
 * Read the instruction slow.
 * mongod  --replSet [name] option are different
-* mongod  --port    [0000] option overrides the default
+* mongod  --port    [0000] option overrides ANY default
 ```
 
 #### Examples
