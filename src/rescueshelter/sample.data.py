@@ -5,7 +5,7 @@ from pymongo.database import Database
 from pymongo.collection import Collection
 from pymongo.operations import InsertOne
 
-connectionString = "mongodb://192.168.43.5:27017"
+connectionString = "mongodb://localhost:27017"
 
 # Python 3.7 in use.
 # Python 3.6 minimal requirement
@@ -111,6 +111,7 @@ def loadSponsorTestData() :
             'firstname': firstname,
             'lastname': lastname,
             'useremail': f'{firstname}.{lastname}@rescueshelter.co',
+            'username': f'{firstname}.{lastname}',
             'photo': '',
             'security': {
                 'password': encryptedData(data='#P@ssw0rd1.', key=f'{firstname}.{lastname}@rescueshelter.co')
