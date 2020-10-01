@@ -1,6 +1,6 @@
 import random
 import datetime
-import redis
+import itertools
 from pymongo import MongoClient
 from pymongo.database import Database
 from pymongo.collection import Collection
@@ -18,6 +18,9 @@ from hashlib import blake2b # Python 3.6
 from multiprocessing import Pool
 from multiprocessing.pool import AsyncResult
 from typing import Iterable, Any
+
+emailDnsTypes = ['gmail.com', 'outlook.com', 'rescueshelter.co', 'yahoo.com']
+emailDns_choice = random.choice
 
 word_size_min = 5
 word_size_max = 10
@@ -101,20 +104,24 @@ def loadSponsorTestData() :
     col = db.get_collection("sponsors")
 
     print('Use #P@ssw0rd1. with these available email:')
-    for index in range(10) :            
-        firstname = ''.join(word_generator(wordTemplate,wordSize))
-        lastname = ''.join(word_generator(wordTemplate,wordSize))
+    for sponsor in itertools.combinations(animalCategoryTypes+animalImageIconTypes, 2) :
+        firstname = ''.join(sponsor[0]).replace(' ', '')
+        lastname = ''.join(sponsor[1])
 
-        print(f'\t{firstname}.{lastname}@rescueshelter.co')
-        col.b
+        domain = emailDns_choice(emailDnsTypes)
+        username = firstname.replace(' ','') + '.' + lastname.replace(' ', '')            
+        useremail = f'{username}@{domain}'
+
+        print(f'\t{useremail}')
+
         col.insert_one({
             'firstname': firstname,
             'lastname': lastname,
-            'useremail': f'{firstname}.{lastname}@rescueshelter.co',
-            'username': f'{firstname}.{lastname}',
+            'useremail': useremail,
+            'username': username,
             'photo': '',
             'security': {
-                'password': encryptedData(data='#P@ssw0rd1.', key=f'{firstname}.{lastname}@rescueshelter.co')
+                'password': encryptedData(data='#P@ssw0rd1.', key=f'{useremail}')
             },
             'audit': []
         })
@@ -212,7 +219,7 @@ def startMulticoreProcessFor(function, args: Iterable[Any], message  = 'Multiple
 
 def main() :
     loadSponsorTestData()
-    loadAnimalTestData(1000000) #oops not 100 Million, 100000000
+    #loadAnimalTestData(1000000) #oops not 100 Million, 100000000
     #startMulticoreProcessFor(bulkLoadAnimalTestData, [100000,], 'loading animal test data with bulk write')
 
 if __name__ == "__main__":
