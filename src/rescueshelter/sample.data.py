@@ -1,5 +1,6 @@
 import random
 import datetime
+import redis
 from pymongo import MongoClient
 from pymongo.database import Database
 from pymongo.collection import Collection
@@ -97,7 +98,6 @@ def loadSponsorTestData() :
     client = MongoClient(connectionString)
     db = client.get_database("rescueshelter")
 
-    #db.drop_collection("sponsors")
     col = db.get_collection("sponsors")
 
     print('Use #P@ssw0rd1. with these available email:')
@@ -127,7 +127,6 @@ def bulkLoadAnimalTestData(insert_count: int = 100000) :
     client = MongoClient(connectionString)
     db = client.get_database("rescueshelter")
 
-    # db.drop_collection("animals")    
     col = db.get_collection("animals")
 
     batches = bulkWriteListSizes(insert_count)
