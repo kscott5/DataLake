@@ -174,7 +174,6 @@ def loadAnimalTestData(insert_count: int = 100000) :
     client = MongoClient(connectionString)
     db = client.get_database("rescueshelter")
 
-    # db.drop_collection("animals")
     col = db.get_collection("animals")
     for batch_size in batches :
         col.insert_many([
@@ -219,7 +218,7 @@ def startMulticoreProcessFor(function, args: Iterable[Any], message  = 'Multiple
 
 def main() :
     loadSponsorTestData()
-    #loadAnimalTestData(1000000) #oops not 100 Million, 100000000
+    loadAnimalTestData(1000000) #oops not 100 Million, 100000000
     #startMulticoreProcessFor(bulkLoadAnimalTestData, [100000,], 'loading animal test data with bulk write')
 
 if __name__ == "__main__":
