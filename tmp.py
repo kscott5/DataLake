@@ -22,7 +22,7 @@ for line in f.readlines(10000) :
     if len(header) == len(data) :        
         json_data = {k:v for k,v in zip(header,data)}
 
-    json_array.append(InsertOne({'has_json': len(header)==len(data), 'header': header, 'raw_data': line, 'json_data': json_data}))    
+    json_array.append(InsertOne({'has_json': len(header)==len(data), 'header': header, 'raw_data': line, 'json_data': json_data}))
 
 collection.bulk_write(json_array)
 
