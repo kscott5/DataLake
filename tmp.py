@@ -6,6 +6,12 @@ from pymongo import MongoClient
 from pymongo.collection import Collection
 from pymongo.operations import InsertOne
 
+# NOTE: Standard random access memory (RAM) on smart devices 
+#       in year 2023 is gigabytes
+kilobyte = 1024             # 1 Kilobyte in bytes
+megabyte = kilobyte*1000    # 1 Megabbyte in kilobytes
+gigabyte = megabyte*1000    # 1 Gigabyte in megabytes
+
 # Nataional Address Database csv file path
 srcFilePath = os.path('/home/kscott/apps/DataLakes/raw/NAD_r11.txt')
 
@@ -14,7 +20,12 @@ destColName = 'nationaladdress'
 
 # Actual size of file source file path
 srcFilePathSize = srcFilePath.stat().st_size
-print(f'')
+
+# Calculate the number of readlines
+readlinesHintSize = srcFilePathSize/(gigabyte/2) # use half gigabyte of RAM
+
+# Calculate the number of possible iteration before end of file (EOF)
+readlinesIterations = srcFilePathSize/readlineIterations
 
 def main():
     f = open(file=srcFilePath.resolve(), mode='r', newline='\n')
