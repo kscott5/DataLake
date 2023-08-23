@@ -1,13 +1,20 @@
 import io
+import os
+from pathlib import Path
+
 from pymongo import MongoClient
 from pymongo.collection import Collection
 from pymongo.operations import InsertOne
 
-srcFilePath = '/home/kscott/apps/DataLakes/raw/NAD_r11.txt'
+srcFilePath = Path('/home/kscott/apps/DataLakes/raw/NAD_r11.txt')
 destColName = 'nationaladdress'
 
+# Actual size of file source file path
+srcFilePathSize = srcFilePath.stat().st_size
+print(f'')
+
 def main():
-    f = open(file=srcFilePath, mode='r', newline='\n')
+    f = open(file=srcFilePath.resolve(), mode='r', newline='\n')
 
     line = f.readline()
     header = line.split(',')
