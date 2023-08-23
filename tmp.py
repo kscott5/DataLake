@@ -6,7 +6,10 @@ from pymongo import MongoClient
 from pymongo.collection import Collection
 from pymongo.operations import InsertOne
 
-srcFilePath = Path('/home/kscott/apps/DataLakes/raw/NAD_r11.txt')
+# Nataional Address Database csv file path
+srcFilePath = os.path('/home/kscott/apps/DataLakes/raw/NAD_r11.txt')
+
+# MongoDb destination collection name
 destColName = 'nationaladdress'
 
 # Actual size of file source file path
