@@ -1,3 +1,4 @@
+import io
 from pymongo import MongoClient
 from pymongo.collection import Collection
 from pymongo.operations import InsertOne
@@ -5,26 +6,40 @@ from pymongo.operations import InsertOne
 srcFilePath = '/home/kscott/apps/DataLakes/raw/NAD_r11.txt'
 destColName = 'nationaladdress'
 
-f = open(file=srcFilePath, mode='r', newline='\n')
+def main():
+    f = open(file=srcFilePath, mode='r', newline='\n')
 
-line = f.readline()
-header = line.split(',')
+    line = f.readline()
+    header = line.split(',')
+    stageNatlAddrData(f,header)
 
-client = MongoClient('mongodb://localhost:27017')
-database = client.get_database('datalake')
-collection = database.get_collection('nataddr.csv.dump')
+    f.close()
 
-json_array = []
-for line in f.readlines(10000) :
-    data = line.split(',') 
+def stageNatlAddrData(f,header) :
+    print(f'starting stage national address data function')
+    if f.closed  : 
+        print('closed')
+        return
 
-    json_data = {}
-    if len(header) == len(data) :        
-        json_data = {k:v for k,v in zip(header,data)}
+    client = MongoClient('mongodb://localhost:27017')
+    database = client.get_database('datalake')
+    collection = database.get_collection('nataddr.csv.dump')
 
-    json_array.append(InsertOne({'has_json': len(header)==len(data), 'header': header, 'raw_data': line, 'json_data': json_data}))
+    print('mongo')
+    json_array = []
+    for line in f.readlines(10000) :
+        data = line.split(',') 
 
-collection.bulk_write(json_array)
+        json_data = {}
+        if len(header) == len(data) :        
+            json_data = {k:v for k,v in zip(header,data)}
 
-client.close()
-f.close()
+        json_array.append(InsertOne({'has_json': len(header)==len(data), 'header': header, 'raw_data': line, 'json_data': json_data}))
+
+    collection.bulk_write(json_array)
+    client.close()
+
+    stageNatlAddrData(f,header)
+
+if __name__ == "__main__" :
+    main()
