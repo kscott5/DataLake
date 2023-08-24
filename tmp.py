@@ -22,10 +22,10 @@ destColName = 'nationaladdress'
 srcFilePathSize = srcFilePath.stat().st_size
 
 # Number of readlines batches inserts size
-readlinesBatchSize = 1000
+readlinesBulkWriteSize = 1000
 
 # Calculate the size of each readlines before end of file (EOF)
-readlinesHintSize = math.ceil(srcFilePathSize/(readlinesBatchSize)) # use of actual available system RAM is better
+readlinesHintSize = math.ceil(srcFilePathSize/(readlinesBulkWriteSize)) # use of actual available system RAM is better
 
 def main():
     f = open(file=srcFilePath.resolve(), mode='r', newline=None)
@@ -43,9 +43,10 @@ def stageNatlAddrData(f,header) :
     database = client.get_database('datalake')
     collection = database.get_collection('nataddr.csv.dump')
 
-    for batch in range(readlinesBatchSize) :
+    for index in range(readlinesBulkWriteSize) :
         if(f.closed) : break
-
+        
+        print(f'{index}. Bulk write started. ')
         json_array = []
         for line in f.readlines(readlinesHintSize) :
             data = line.split(',') 
@@ -57,6 +58,7 @@ def stageNatlAddrData(f,header) :
             json_array.append(InsertOne({'has_json': len(header)==len(data), 'header': header, 'raw_data': line, 'json_data': json_data}))
 
         collection.bulk_write(json_array)
+        print(f'...Done!\n')
 
     client.close()
 
