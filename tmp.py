@@ -37,7 +37,7 @@ def main():
     f.close()
 
 def stageNatlAddrData(f,header) :
-    print(f'CSV Dump: National Address Database. Source file {srcFilePath.name} size {srcFilePathSize}. Destination datalake.nataddr.csv.dump')
+    print(f'CSV Dump: National Address Database. Source file {srcFilePath.name} size {srcFilePathSize}. Destination datalake.nataddr.csv.dump\n')
     
     client = MongoClient('mongodb://localhost:27017')
     database = client.get_database('datalake')
