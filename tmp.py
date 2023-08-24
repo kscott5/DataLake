@@ -1,5 +1,4 @@
 import io
-import os
 from pathlib import Path
 
 from pymongo import MongoClient
@@ -13,7 +12,7 @@ megabyte = kilobyte*1000    # 1 Megabbyte in kilobytes
 gigabyte = megabyte*1000    # 1 Gigabyte in megabytes
 
 # Nataional Address Database csv file path
-srcFilePath = os.path('/home/kscott/apps/DataLakes/raw/NAD_r11.txt')
+srcFilePath = Path('/home/kscott/apps/DataLakes/raw/NAD_r11.txt')
 
 # MongoDb destination collection name
 destColName = 'nationaladdress'
@@ -28,7 +27,7 @@ readlinesBatchSize = 100
 readlinesHintSize = srcFilePathSize/(readlinesBatchSize) # use of actual available system RAM is better
 
 def main():
-    f = open(file=srcFilePath.resolve(), mode='r', newline=["\n","\r"])
+    f = open(file=srcFilePath.resolve(), mode='r', newline=None)
 
     line = f.readline()
     header = line.split(',')
