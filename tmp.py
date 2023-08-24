@@ -21,14 +21,14 @@ destColName = 'nationaladdress'
 # Actual size of file source file path
 srcFilePathSize = srcFilePath.stat().st_size
 
-# Calculate the number of readlines
-readlinesHintSize = srcFilePathSize/(gigabyte/2) # use half gigabyte of RAM
+# Number of readlines batches inserts size
+readlinesBatchSize = 100
 
-# Calculate the number of possible iteration before end of file (EOF)
-readlinesIterations = srcFilePathSize/readlineIterations
+# Calculate the size of each readlines before end of file (EOF)
+readlinesHintSize = srcFilePathSize/(readlinesBatchSize) # use of actual available system RAM is better
 
 def main():
-    f = open(file=srcFilePath.resolve(), mode='r', newline='\n')
+    f = open(file=srcFilePath.resolve(), mode='r', newline=["\n","\r"])
 
     line = f.readline()
     header = line.split(',')
@@ -38,29 +38,28 @@ def main():
 
 def stageNatlAddrData(f,header) :
     print(f'starting stage national address data function')
-    if f.closed  : 
-        print('closed')
-        return
 
     client = MongoClient('mongodb://localhost:27017')
     database = client.get_database('datalake')
     collection = database.get_collection('nataddr.csv.dump')
 
-    print('mongo')
-    json_array = []
-    for line in f.readlines(10000) :
-        data = line.split(',') 
+    for batch in range(readlinesRange) :
+        if(f.closed) : break
 
-        json_data = {}
-        if len(header) == len(data) :        
-            json_data = {k:v for k,v in zip(header,data)}
+        json_array = []
+        for line in f.readlines(readlinesHintSize) :
+            data = line.split(',') 
 
-        json_array.append(InsertOne({'has_json': len(header)==len(data), 'header': header, 'raw_data': line, 'json_data': json_data}))
+            json_data = {}
+            if len(header) == len(data) :        
+                json_data = {k:v for k,v in zip(header,data)}
 
-    collection.bulk_write(json_array)
+            json_array.append(InsertOne({'has_json': len(header)==len(data), 'header': header, 'raw_data': line, 'json_data': json_data}))
+
+        collection.bulk_write(json_array)
+
     client.close()
 
-    stageNatlAddrData(f,header)
 
 if __name__ == "__main__" :
     main()
