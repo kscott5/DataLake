@@ -37,7 +37,7 @@ def main():
     f.close()
 
 def stageNatlAddrData(f,header) :
-    print(f'starting stage national address data function')
+    print(f'CSV Dump: National Address Database')
 
     client = MongoClient('mongodb://localhost:27017')
     database = client.get_database('datalake')
@@ -46,7 +46,7 @@ def stageNatlAddrData(f,header) :
     for index in range(readlinesBulkWriteSize) :
         if(f.closed) : break
         
-        print(f'{index}. Bulk write started. ')
+        print(f'{index}. Bulk write started', sep='', end='')
         json_array = []
         for line in f.readlines(readlinesHintSize) :
             data = line.split(',') 
@@ -58,7 +58,7 @@ def stageNatlAddrData(f,header) :
             json_array.append(InsertOne({'has_json': len(header)==len(data), 'header': header, 'raw_data': line, 'json_data': json_data}))
 
         collection.bulk_write(json_array)
-        print(f'...Done!\n')
+        print(f'...DONE!')
 
     client.close()
 
