@@ -1,4 +1,5 @@
 import io
+import math
 from pathlib import Path
 
 from pymongo import MongoClient
@@ -21,10 +22,10 @@ destColName = 'nationaladdress'
 srcFilePathSize = srcFilePath.stat().st_size
 
 # Number of readlines batches inserts size
-readlinesBatchSize = 100
+readlinesBatchSize = 1000
 
 # Calculate the size of each readlines before end of file (EOF)
-readlinesHintSize = srcFilePathSize/(readlinesBatchSize) # use of actual available system RAM is better
+readlinesHintSize = math.ceil(srcFilePathSize/(readlinesBatchSize)) # use of actual available system RAM is better
 
 def main():
     f = open(file=srcFilePath.resolve(), mode='r', newline=None)
@@ -42,7 +43,7 @@ def stageNatlAddrData(f,header) :
     database = client.get_database('datalake')
     collection = database.get_collection('nataddr.csv.dump')
 
-    for batch in range(readlinesRange) :
+    for batch in range(readlinesBatchSize) :
         if(f.closed) : break
 
         json_array = []
