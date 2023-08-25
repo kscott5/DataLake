@@ -28,10 +28,12 @@ readlinesBulkWriteSize = 1000
 readlinesHintSize = math.ceil(srcFilePathSize/(readlinesBulkWriteSize)) # use of actual available system RAM is better
 
 def main():
+    # newline=None removes \n, \r or \n\r
+    # results in actual file size difference reduction
     f = open(file=srcFilePath.resolve(), mode='r', newline=None)
 
     line = f.readline()
-    header = line.split(',')
+    header = line.split(',') # again, resuls in actual file size difference or reduction
     stageNatlAddrData(f,header)
 
     f.close()
