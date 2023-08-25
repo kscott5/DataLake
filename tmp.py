@@ -14,7 +14,7 @@ gigabyte = megabyte*1000    # 1 Gigabyte in megabytes
 
 # Nataional Address Database csv file and schema paths
 srcFilePath     = Path(f'/home/kscott/apps/DataLakes/raw/NAD_r11.txt')
-srcSchemaPath   = Path(f'/home/scott/apps/DataLakes/raw/NAD_schema.ini')
+srcSchemaPath   = Path(f'/home/kscott/apps/DataLakes/raw/NAD_schema.ini')
 
 # Version of national address database collection/table
 destVersion = "1.0" # Not in use today
@@ -37,21 +37,8 @@ def main():
     #stageNatlAddrData(header)
 
 
-def loadNatlAddrSchemaData() : []
-""" Loads and returns an array map of National Address Schema data in squential order 
-    loaded from schema file
-    
-    Schema data format
-    [
-        {
-            field: column name
-            type: column data type
-            widht: length (optional)
-        },
-    ...]
-
-"""
-    print(f'INI Dump: National Address Database Schema. Source file {srcSchemaPath.name} size {srcSchemaPathSizePathSize}.\n')
+def loadNatlAddrSchemaData() : 
+    print(f'INI Dump: National Address Database Schema. Source file {srcSchemaPath.name} size {srcSchemaPathSize}.\n')
 
     SCHEMA_DATA_FIELD_INDEX = 0 # *required
     SCHEMA_DATA_TYPE_INDEX  = 1 # *required
@@ -59,16 +46,17 @@ def loadNatlAddrSchemaData() : []
     SCHEMA_DATA_LEN_INDEX   = 3 # optional
 
     sf = open(file=srcSchemaPath.resolve(), mode='r', newline=None)
-    lines = sf.readlines(hint=srcSchemaPathSize)
+    lines = sf.readlines(srcSchemaPathSize)
 
     schema_array = []
 
     # Ignores file descriptor lines
     for i in range(3, len(lines)) :
-        schema = lines[i].split('=')[1] # column schema details: {field, type, width:optional, length:optional}}
+        data = lines[i].split('=')[1]  # column schema details
+        schema = data.split(' ')    #   {field, type, width:optional, length:optional}
         
         schema_data = {'field': schema[SCHEMA_DATA_FIELD_INDEX], 'type': schema[SCHEMA_DATA_TYPE_INDEX]}
-        if len(schema) > 1 : 
+        if len(schema) > 2 : 
             schema_data['width'] = schema[SCHEMA_DATA_LEN_INDEX]
         schema_array.append(schema_data)
 
