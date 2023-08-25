@@ -51,6 +51,8 @@ def loadNatlAddrSchemaData() : []
     ...]
 
 """
+    print(f'INI Dump: National Address Database Schema. Source file {srcSchemaPath.name} size {srcSchemaPathSizePathSize}.\n')
+
     SCHEMA_DATA_FIELD_INDEX = 0 # *required
     SCHEMA_DATA_TYPE_INDEX  = 1 # *required
     SCHEMA_DATA_WIDTH_INDEX = 2 # optional
@@ -70,6 +72,7 @@ def loadNatlAddrSchemaData() : []
             schema_data['width'] = schema[SCHEMA_DATA_LEN_INDEX]
         schema_array.append(schema_data)
 
+    print(schema_array)
     return schema_array
 
 def loadNatlAddrData(header) :
