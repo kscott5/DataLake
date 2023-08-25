@@ -57,7 +57,8 @@ def stageNatlAddrData(f,header) :
 
             json_array.append(InsertOne({'has_json': len(header)==len(data), 'header': header, 'raw_data': line, 'json_data': json_data}))
 
-        collection.bulk_write(json_array)
+        if len(json_array) > 0 :     
+            collection.bulk_write(json_array)
         print(f'...DONE!')
 
     client.close()
