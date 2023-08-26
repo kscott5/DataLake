@@ -37,7 +37,7 @@ def main():
 
 def loadNatlAddrSchemaData() :     
     path  = Path(f'/home/kscott/apps/DataLakes/raw/NAD_schema.ini')
-    if not path.exists() or path.stat().st_size == 0 : return None
+    if not path.exists() or path.stat().st_size == 0 : return None # schema_array
     
     print(f'INI Dump: National Address Database Schema. Source file {path.name} size {path.stat().st_size}.\n')
     
