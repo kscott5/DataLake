@@ -72,18 +72,18 @@ def loadNatlAddrSchemaData() :
         schema_array = data.split(' ') # has single array [field_name, field_type, field_width:optional, field_length:optional]
         
         # create a new key value pair item
-        schema_keyvalue_pair = {'field': schema_array[SCHEMA_DATA_FIELD_INDEX], 'type': schema_array[SCHEMA_DATA_TYPE_INDEX]}
+        schema_dict = {schema_array[SCHEMA_DATA_FIELD_INDEX]: schema_array[SCHEMA_DATA_TYPE_INDEX]}
 
         if len(schema_array) > 2 : # optional data items exists
-            schema_keyvalue_pair['width'] = schema_array[SCHEMA_DATA_LEN_INDEX] # append the optional key value pair
+            schema_dict['width'] = schema_array[SCHEMA_DATA_LEN_INDEX] # append the optional key value pair
 
         # append new column key value pair schema data at end of array
-        schema['headers_array'].append(schema_keyvalue_pair)
+        schema['headers_array'].append(schema_dict)
 
     print(f'DONE!\n')
     return schema
 
-def loadNatlAddrData(header) :
+def loadNatlAddrData(schema) :
     #format from June/July 2023
     path = Path(f'/home/kscott/apps/DataLakes/raw/NAD_r11.txt')
     if not path.exists() or path.stat().st_size == 0: return
@@ -98,7 +98,8 @@ def loadNatlAddrData(header) :
 
     line = dfile.readline()
     header = line.split(',').rstrip('\n') # again, resuls in actual file size difference or reduction
-        
+    
+    schema.headers_array
     client = MongoClient('mongodb://localhost:27017')
     database = client.get_database('datalake')
     collection = database.get_collection('nataddr.csv.dump')
