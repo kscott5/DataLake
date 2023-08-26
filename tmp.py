@@ -26,6 +26,8 @@ readlinesBulkWriteSize = 1000
 
 def main():
     schema = loadNatlAddrSchemaData()
+
+    print(schema)
     #stageNatlAddrData(header)
 
 
@@ -33,7 +35,7 @@ def loadNatlAddrSchemaData() :
     path  = Path(f'/home/kscott/apps/DataLakes/raw/NAD_schema.ini')
     if not path.exists() or path.stat().st_size == 0 : return None # schema_ini
     
-    print(f'INI Dump: National Address Database Schema. Source file {path.name} size {path.stat().st_size}.\n')
+    print(f'INI Dump: National Address Database Schema. Access source file {path.name} with size {path.stat().st_size} memory load...', end='')
     
     SCHEMA_DATA_FIELD_INDEX = 0 # *required
     SCHEMA_DATA_TYPE_INDEX  = 1 # *required
@@ -47,11 +49,12 @@ def loadNatlAddrSchemaData() :
 
     if not len(lines) == 45 : return None # schema_ini
 
-    schema_ini = {
-            'data_filename': lines[0],
-            'format_type': lines[1],
-            'header_exists': lines[2],
-            'header_schema_array': []
+    # format definition from June/July 2023
+    schema = {
+            'data_filename': lines[0].rstrip('\n'),                 # and not newline character
+            'format_type': lines[1].split('=')[1].rstrip('\n'),     # and not new line character
+            'header_exists': lines[2].split('=')[1].rstrip('\n'),   # and not new line character
+            'headers_array': []                               # initialize size empty or zero
     }
 
     # Ignores file descriptor lines
@@ -66,21 +69,22 @@ def loadNatlAddrSchemaData() :
         data = data[1].rstrip('\n')     # remove any newline characters from strings end
         if len(data) == 0 : continue    # data does not exists
 
-        schema = data.split(' ') # has single array [field_name, field_type, field_width:optional, field_length:optional]
+        schema_array = data.split(' ') # has single array [field_name, field_type, field_width:optional, field_length:optional]
         
         # create a new key value pair item
-        schema_data = {'field': schema[SCHEMA_DATA_FIELD_INDEX], 'type': schema[SCHEMA_DATA_TYPE_INDEX]}
+        schema_keyvalue_pair = {'field': schema_array[SCHEMA_DATA_FIELD_INDEX], 'type': schema_array[SCHEMA_DATA_TYPE_INDEX]}
 
-        if len(schema) > 2 : # optional data items exists
-            schema_data['width'] = schema[SCHEMA_DATA_LEN_INDEX] # append the optional key value pair
+        if len(schema_array) > 2 : # optional data items exists
+            schema_keyvalue_pair['width'] = schema_array[SCHEMA_DATA_LEN_INDEX] # append the optional key value pair
 
         # append new column key value pair schema data at end of array
-        schema_ini['header_schema_array'].append(schema_data)
+        schema['headers_array'].append(schema_keyvalue_pair)
 
-    print(schema_ini)
-    return schema_ini
+    print(f'DONE!')
+    return schema
 
 def loadNatlAddrData(header) :
+    #format from June/July 2023
     path = Path(f'/home/kscott/apps/DataLakes/raw/NAD_r11.txt')
     if not path.exists() or path.stat().st_size == 0: return
 
