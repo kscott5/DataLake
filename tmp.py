@@ -14,7 +14,6 @@ gigabyte = megabyte*1000    # 1 Gigabyte in megabytes
 
 # Nataional Address Database csv file and schema paths
 srcFilePath     = Path(f'/home/kscott/apps/DataLakes/raw/NAD_r11.txt')
-srcSchemaPath   = Path(f'/home/kscott/apps/DataLakes/raw/NAD_schema.ini')
 
 # Version of national address database collection/table
 destVersion = "1.0" # Not in use today
@@ -24,7 +23,6 @@ destColName = 'nationaladdress'
 
 # Actual size of file source file path
 srcFilePathSize         = srcFilePath.stat().st_size
-srcSchemaPathSize       = srcSchemaPath.stat().st_size
 
 # Number of readlines batches inserts size
 readlinesBulkWriteSize = 1000
@@ -37,22 +35,27 @@ def main():
     #stageNatlAddrData(header)
 
 
-def loadNatlAddrSchemaData() : 
-    print(f'INI Dump: National Address Database Schema. Source file {srcSchemaPath.name} size {srcSchemaPathSize}.\n')
-
+def loadNatlAddrSchemaData() :     
+    path  = Path(f'/home/kscott/apps/DataLakes/raw/NAD_schema.ini')
+    if not path.exists() or path.stat().st_size == 0 : return []
+    
+    print(f'INI Dump: National Address Database Schema. Source file {path.name} size {path.stat().st_size}.\n')
+    
     SCHEMA_DATA_FIELD_INDEX = 0 # *required
     SCHEMA_DATA_TYPE_INDEX  = 1 # *required
     SCHEMA_DATA_WIDTH_INDEX = 2 # optional
     SCHEMA_DATA_LEN_INDEX   = 3 # optional
 
-    sf = open(file=srcSchemaPath.resolve(), mode='r', newline=None)
-    lines = sf.readlines(srcSchemaPathSize)
+    # Load all schema data and close
+    sfile= open(file=srcSchemaPath.resolve(), mode='r', newline=None)
+    lines = sf.readlines(srcSchemaPathSize) 
+    sfile.close()
 
     schema_array = []
 
     # Ignores file descriptor lines
     for i in range(3, len(lines)) :
-        data = lines[i].split('=')[1]  # column schema details
+        data = lines[i].split('=')[1].rstrip('\n')  # column schema details 
         schema = data.split(' ')    #   {field, type, width:optional, length:optional}
         
         schema_data = {'field': schema[SCHEMA_DATA_FIELD_INDEX], 'type': schema[SCHEMA_DATA_TYPE_INDEX]}
@@ -66,12 +69,11 @@ def loadNatlAddrSchemaData() :
 def loadNatlAddrData(header) :
     print(f'CSV Dump: National Address Database. Source file {srcFilePath.name} size {srcFilePathSize}. Destination datalake.nataddr.csv.dump\n')
     
-    # newline=None removes \n, \r or \n\r
     # results in actual file size difference reduction
     f = open(file=srcFilePath.resolve(), mode='r', newline=None)
 
     line = f.readline()
-    header = line.split(',') # again, resuls in actual file size difference or reduction
+    header = line.split(',').rstrip('\n') # again, resuls in actual file size difference or reduction
         
     client = MongoClient('mongodb://localhost:27017')
     database = client.get_database('datalake')
