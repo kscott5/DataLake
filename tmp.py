@@ -52,7 +52,7 @@ def testLoadNatlAddrSchema() :
         print(f'NOT GOOD!\n\theaders_exists: {schema.get("headers_exists")} not equal True')
         return
 
-    if len(schema.get("headers").keys()) == 10 : pass
+    if len(schema.get("headers").keys()) == 42 : pass
     else :
         print(f'NOT GOOD!\n\theaders count {len(schema.get("headers"))} not equal 10')
         return
