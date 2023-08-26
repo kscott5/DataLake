@@ -48,9 +48,9 @@ def loadNatlAddrSchemaData() :
     if not len(lines) == 45 : return None # schema_ini
 
     schema_ini = {
-            'data_filename': line[0],
-            'format_type': line[1],
-            'header_exists': line[2],
+            'data_filename': lines[0],
+            'format_type': lines[1],
+            'header_exists': lines[2],
             'header_schema_array': []
     }
 
