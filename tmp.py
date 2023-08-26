@@ -57,6 +57,17 @@ def testLoadNatlAddrSchema() :
         print(f'NOT GOOD!\n\theaders count {len(schema.get("headers"))} not equal 10')
         return
 
+    data = schema.get("headers").get("OID")
+    if not data == None and data["type"] == "Long" : pass
+
+    data = schema.get("headers").get("State")
+    if not data == None and data["type"] == "Text" and not data["width"] == None and  data["width"] == '2' : pass
+    else :
+        print(f'State not valid schema: {data}')
+        return
+
+    # example test case with a framework
+
     print(f'GOOD!')
 
 def loadNatlAddrSchemaData() :     
@@ -136,7 +147,7 @@ def loadNatlAddrData(schema) :
         print(f'{index}. Bulk write started', sep='', end='')
         json_array = []
         for line in dfile.readlines(readlinesHintSize) :
-            data = line.split(',') 
+            data = line.rstrip('\n').split(',') 
 
             json_data = {}
             if len(header) == len(data) :        
