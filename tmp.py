@@ -80,7 +80,7 @@ def loadNatlAddrSchemaData() :
         # append new column key value pair schema data at end of array
         schema['headers_array'].append(schema_keyvalue_pair)
 
-    print(f'DONE!')
+    print(f'DONE!\n')
     return schema
 
 def loadNatlAddrData(header) :
