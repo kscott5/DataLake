@@ -23,13 +23,41 @@ destColName = 'nationaladdress'
 # Number of readlines batches inserts size
 readlinesBulkWriteSize = 1000
 
-
 def main():
-    schema = loadNatlAddrSchemaData()
+    testLoadNatlAddrSchema()
 
-    print(schema)
     #stageNatlAddrData(header)
 
+def testLoadNatlAddrSchema() :
+    print(f'testLoadNatlAddrSchema...', end='')
+    schema = loadNatlAddrSchemaData()
+
+    if not schema == None : pass
+    else : 
+        print(f'NOT GOOD!\n\tloadNatlAddrSchemaData NONE!')
+        return
+
+    if schema.get("data_filename") == "[NAD_r11.txt]" : pass
+    else : 
+        print(f'NOT GOOD!\n\tdata_filename: {schema.get("data_filename")} not equal [NAD_r11.txt]')
+        return
+
+    if schema.get("format_type") == "CSVDelimited" : pass
+    else : 
+        print(f'NOT GOOD!\n\tformat_type: {schema.get("format_type")} not equal CSVDelimited')
+        return
+
+    if schema.get("headers_exists") == 'True' : pass
+    else : 
+        print(f'NOT GOOD!\n\theaders_exists: {schema.get("headers_exists")} not equal True')
+        return
+
+    if len(schema.get("headers").keys()) == 10 : pass
+    else :
+        print(f'NOT GOOD!\n\theaders count {len(schema.get("headers"))} not equal 10')
+        return
+
+    print(f'GOOD!')
 
 def loadNatlAddrSchemaData() :     
     path  = Path(f'/home/kscott/apps/DataLakes/raw/NAD_schema.ini')
@@ -53,8 +81,8 @@ def loadNatlAddrSchemaData() :
     schema = {
             'data_filename': lines[0].rstrip('\n'),                 # and not newline character
             'format_type': lines[1].split('=')[1].rstrip('\n'),     # and not new line character
-            'header_exists': lines[2].split('=')[1].rstrip('\n'),   # and not new line character
-            'headers_array': []                               # initialize size empty or zero
+            'headers_exists': lines[2].split('=')[1].rstrip('\n'),   # and not new line character
+            'headers': {}                                           # initialize dictionary size empty or zero
     }
 
     # Ignores file descriptor lines
@@ -72,13 +100,11 @@ def loadNatlAddrSchemaData() :
         schema_array = data.split(' ') # has single array [field_name, field_type, field_width:optional, field_length:optional]
         
         # create a new key value pair item
-        schema_dict = {schema_array[SCHEMA_DATA_FIELD_INDEX]: schema_array[SCHEMA_DATA_TYPE_INDEX]}
+        key = schema_array[SCHEMA_DATA_FIELD_INDEX]
+        schema['headers'][key] = {'type': schema_array[SCHEMA_DATA_TYPE_INDEX]}
 
         if len(schema_array) > 2 : # optional data items exists
-            schema_dict['width'] = schema_array[SCHEMA_DATA_LEN_INDEX] # append the optional key value pair
-
-        # append new column key value pair schema data at end of array
-        schema['headers_array'].append(schema_dict)
+            schema['headers'][key]['width'] = schema_array[SCHEMA_DATA_LEN_INDEX] # append the optional key value pair
 
     print(f'DONE!\n')
     return schema
@@ -99,7 +125,7 @@ def loadNatlAddrData(schema) :
     line = dfile.readline()
     header = line.split(',').rstrip('\n') # again, resuls in actual file size difference or reduction
     
-    schema.headers_array
+    
     client = MongoClient('mongodb://localhost:27017')
     database = client.get_database('datalake')
     collection = database.get_collection('nataddr.csv.dump')
