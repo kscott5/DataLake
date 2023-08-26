@@ -13,7 +13,6 @@ megabyte = kilobyte*1000    # 1 Megabbyte in kilobytes
 gigabyte = megabyte*1000    # 1 Gigabyte in megabytes
 
 # Nataional Address Database csv file and schema paths
-srcFilePath     = Path(f'/home/kscott/apps/DataLakes/raw/NAD_r11.txt')
 
 # Version of national address database collection/table
 destVersion = "1.0" # Not in use today
@@ -21,14 +20,9 @@ destVersion = "1.0" # Not in use today
 # MongoDb destination collection name
 destColName = 'nationaladdress'
 
-# Actual size of file source file path
-srcFilePathSize         = srcFilePath.stat().st_size
-
 # Number of readlines batches inserts size
 readlinesBulkWriteSize = 1000
 
-# Calculate the size of each readlines before end of file (EOF)
-readlinesHintSize = math.ceil(srcFilePathSize/(readlinesBulkWriteSize)) # use of actual available system RAM is better
 
 def main():
     schema = loadNatlAddrSchemaData()
@@ -37,7 +31,7 @@ def main():
 
 def loadNatlAddrSchemaData() :     
     path  = Path(f'/home/kscott/apps/DataLakes/raw/NAD_schema.ini')
-    if not path.exists() or path.stat().st_size == 0 : return None # schema_array
+    if not path.exists() or path.stat().st_size == 0 : return None # schema_ini
     
     print(f'INI Dump: National Address Database Schema. Source file {path.name} size {path.stat().st_size}.\n')
     
@@ -51,7 +45,14 @@ def loadNatlAddrSchemaData() :
     lines = sfile.readlines(path.stat().st_size) 
     sfile.close()
 
-    schema_array = []
+    if not len(lines) == 45 : return None # schema_ini
+
+    schema_ini = {
+            'data_filename': line[0],
+            'format_type': line[1],
+            'header_exists': line[2],
+            'header_schema_array': []
+    }
 
     # Ignores file descriptor lines
     for i in range(3, len(lines)) :
@@ -74,18 +75,24 @@ def loadNatlAddrSchemaData() :
             schema_data['width'] = schema[SCHEMA_DATA_LEN_INDEX] # append the optional key value pair
 
         # append new column key value pair schema data at end of array
-        schema_array.append(schema_data)
+        schema_ini['header_schema_array'].append(schema_data)
 
-    print(schema_array)
-    return schema_array
+    print(schema_ini)
+    return schema_ini
 
 def loadNatlAddrData(header) :
-    print(f'CSV Dump: National Address Database. Source file {srcFilePath.name} size {srcFilePathSize}. Destination datalake.nataddr.csv.dump\n')
-    
-    # results in actual file size difference reduction
-    f = open(file=srcFilePath.resolve(), mode='r', newline=None)
+    path = Path(f'/home/kscott/apps/DataLakes/raw/NAD_r11.txt')
+    if not path.exists() or path.stat().st_size == 0: return
 
-    line = f.readline()
+    print(f'CSV Dump: National Address Database. Source file {path.name} size {path.stat().st_size}. Destination datalake.nataddr.csv.dump\n')
+
+    # Calculate the size of each readlines before end of file (EOF)
+    readlinesHintSize = math.ceil(path.stat().st_size/(readlinesBulkWriteSize)) # use of actual available system RAM is better
+
+    # results in actual file size difference reduction
+    dfile = open(file=path.resolve(), mode='r', newline=None)
+
+    line = dfile.readline()
     header = line.split(',').rstrip('\n') # again, resuls in actual file size difference or reduction
         
     client = MongoClient('mongodb://localhost:27017')
@@ -93,11 +100,11 @@ def loadNatlAddrData(header) :
     collection = database.get_collection('nataddr.csv.dump')
 
     for index in range(readlinesBulkWriteSize) :
-        if(f.closed) : break
+        if(dfile.closed) : break
         
         print(f'{index}. Bulk write started', sep='', end='')
         json_array = []
-        for line in f.readlines(readlinesHintSize) :
+        for line in dfile.readlines(readlinesHintSize) :
             data = line.split(',') 
 
             json_data = {}
@@ -111,7 +118,7 @@ def loadNatlAddrData(header) :
         print(f'...DONE!')
 
     client.close()
-    f.close()
+    dfile.close()
 
 
 if __name__ == "__main__" :
