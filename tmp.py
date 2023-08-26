@@ -37,7 +37,7 @@ def main():
 
 def loadNatlAddrSchemaData() :     
     path  = Path(f'/home/kscott/apps/DataLakes/raw/NAD_schema.ini')
-    if not path.exists() or path.stat().st_size == 0 : return []
+    if not path.exists() or path.stat().st_size == 0 : return None
     
     print(f'INI Dump: National Address Database Schema. Source file {path.name} size {path.stat().st_size}.\n')
     
@@ -47,20 +47,33 @@ def loadNatlAddrSchemaData() :
     SCHEMA_DATA_LEN_INDEX   = 3 # optional
 
     # Load all schema data and close
-    sfile= open(file=srcSchemaPath.resolve(), mode='r', newline=None)
-    lines = sf.readlines(srcSchemaPathSize) 
+    sfile= open(file=path.resolve(), mode='r', newline=None)
+    lines = sfile.readlines(path.stat().st_size) 
     sfile.close()
 
     schema_array = []
 
     # Ignores file descriptor lines
     for i in range(3, len(lines)) :
-        data = lines[i].split('=')[1].rstrip('\n')  # column schema details 
-        schema = data.split(' ')    #   {field, type, width:optional, length:optional}
+        data = lines[i].split('=') 
         
+        # verify line format either
+        #   COL1=field_name field_type {opptional: field_width field_length}
+        if len(data) < 1 : continue # next loop. Line in wrong format 
+
+        # ignore first item at array index 0
+        data = data[1].rstrip('\n')     # remove any newline characters from strings end
+        if len(data) == 0 : continue    # data does not exists
+
+        schema = data.split(' ') # has single array [field_name, field_type, field_width:optional, field_length:optional]
+        
+        # create a new key value pair item
         schema_data = {'field': schema[SCHEMA_DATA_FIELD_INDEX], 'type': schema[SCHEMA_DATA_TYPE_INDEX]}
-        if len(schema) > 2 : 
-            schema_data['width'] = schema[SCHEMA_DATA_LEN_INDEX]
+
+        if len(schema) > 2 : # optional data items exists
+            schema_data['width'] = schema[SCHEMA_DATA_LEN_INDEX] # append the optional key value pair
+
+        # append new column key value pair schema data at end of array
         schema_array.append(schema_data)
 
     print(schema_array)
