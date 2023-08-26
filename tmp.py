@@ -29,8 +29,8 @@ def main():
     #stageNatlAddrData(header)
 
 def testLoadNatlAddrSchema() :
-    print(f'testLoadNatlAddrSchema...', end='')
     schema = loadNatlAddrSchemaData()
+    print(f'testLoadNatlAddrSchema...', end='')
 
     if not schema == None : pass
     else : 
