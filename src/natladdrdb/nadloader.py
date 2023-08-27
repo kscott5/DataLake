@@ -71,7 +71,7 @@ def testLoadNatlAddrSchema() :
     print(f'GOOD!')
 
 def loadNatlAddrSchemaData() :     
-    path  = Path(f'/home/kscott/apps/DataLakes/raw/NAD_schema.ini')
+    path  = Path(f'/home/kscott/apps/NAD/NAD_schema.ini')
     if not path.exists() or path.stat().st_size == 0 : return None # schema_ini
     
     print(f'INI Dump: National Address Database Schema. Access source file {path.name} with size {path.stat().st_size} memory load...', end='')
@@ -104,7 +104,9 @@ def loadNatlAddrSchemaData() :
         #   COL1=field_name field_type {opptional: field_width field_length}
         if len(data) < 1 : continue # next loop. Line in wrong format 
 
-        # ignore first item at array index 0
+        # save column header index
+        index = data[0].lstrip('Col')
+
         data = data[1].rstrip('\n')     # remove any newline characters from strings end
         if len(data) == 0 : continue    # data does not exists
 
@@ -112,7 +114,7 @@ def loadNatlAddrSchemaData() :
         
         # create a new key value pair item
         key = schema_array[SCHEMA_DATA_FIELD_INDEX]
-        schema['headers'][key] = {'type': schema_array[SCHEMA_DATA_TYPE_INDEX]}
+        schema['headers'][key] = {'index': index, 'type': schema_array[SCHEMA_DATA_TYPE_INDEX]}
 
         if len(schema_array) > 2 : # optional data items exists
             schema['headers'][key]['width'] = schema_array[SCHEMA_DATA_LEN_INDEX] # append the optional key value pair
@@ -122,7 +124,7 @@ def loadNatlAddrSchemaData() :
 
 def loadNatlAddrData(schema) :
     #format from June/July 2023
-    path = Path(f'/home/kscott/apps/DataLakes/raw/NAD_r11.txt')
+    path = Path(f'/home/kscott/apps/NAD/NAD_r11.txt')
     if not path.exists() or path.stat().st_size == 0: return
 
     print(f'CSV Dump: National Address Database. Source file {path.name} size {path.stat().st_size}. Destination datalake.nataddr.csv.dump\n')
