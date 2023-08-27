@@ -58,7 +58,10 @@ def testLoadNatlAddrSchema() :
         return
 
     data = schema.get("headers").get("OID")
-    if not data == None and data["type"] == "Long" : pass
+    if not data == None and data["type"] == "Long" and data["index"] == "0" : pass
+    else :
+        print(f'NOT GOOD!\n\tColumn: OID {{\'ndex\': \'0\', \'type\': \'Long\'}} not {data}')
+        return
 
     data = schema.get("headers").get("State")
     if not data == None and data["type"] == "Text" and not data["width"] == None and  data["width"] == '2' : pass
