@@ -138,13 +138,14 @@ def loadNatlAddrData(schema) :
     # results in actual file size difference reduction
     dfile = open(file=path.resolve(), mode='r', newline=None)
 
-    line = dfile.readline()
-    header = line.split(',').rstrip('\n') # again, resuls in actual file size difference or reduction
+    headers = []
+    if schema.get('has_headers') == 'True' :
+        line = dfile.readline()
+        headers = line.split(',').rstrip('\n') # again, resuls in actual file size difference or reduction
     
-    
-    client = MongoClient('mongodb://localhost:27017')
+    client = MongoClient('mongodb://192.168.1.218:27017')
     database = client.get_database('datalake')
-    collection = database.get_collection('nataddr.csv.dump')
+    collection = database.get_collection('natladdr.csv.dump')
 
     for index in range(readlinesBulkWriteSize) :
         if(dfile.closed) : break
@@ -154,11 +155,19 @@ def loadNatlAddrData(schema) :
         for line in dfile.readlines(readlinesHintSize) :
             data = line.rstrip('\n').split(',') 
 
-            json_data = {}
-            if len(header) == len(data) :        
-                json_data = {k:v for k,v in zip(header,data)}
-
-            json_array.append(InsertOne({'has_json': len(header)==len(data), 'header': header, 'raw_data': line, 'json_data': json_data}))
+            data_exists = false
+            if schema.get('headers_exists') == 'True' and len(headers)==len(data):
+                data_exists = true
+                headers = ''
+                line = ''
+                
+            # zip() ignores any data array items, column, without a sequential header array item.
+            json_data = {k:v for k,v in zip(header,data)} 
+            json_array.append(InsertOne({
+                'headers': headers,
+                'data_exits': has_data,
+                'data': line,
+                'json_data': json_data}))
 
         if len(json_array) > 0 :     
             collection.bulk_write(json_array)
