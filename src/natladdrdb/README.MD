@@ -6,7 +6,7 @@ in size.
 My plan was simple import with MongoImport. However, [MongoImport](https://www.mongodb.com/docs/database-tools/mongoimport/) stops if major
 differences between the actual and expected number of columns. Therefore, my plan
 changed and my nadloader.py [python script](https://www.python.org/) with 
-the help from [pymongo](https://pypi.org/project/pymongo/) package did import the data. The concern with this approach was
+help from [pymongo](https://pypi.org/project/pymongo/) package did import the data. The concern with this approach was
 the start and stop completion time. The plan changed again,
 with sqlite3. 
 
