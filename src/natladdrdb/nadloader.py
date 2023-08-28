@@ -49,24 +49,24 @@ def testLoadNatlAddrSchema() :
 
     if schema.get("headers_exists") == 'True' : pass
     else : 
-        print(f'NOT GOOD!\n\theaders_exists: {schema.get("headers_exists")} not equal True')
+        print(f'NOT GOOD!\n\theaders_exists: expects True not {schema.get("headers_exists")}')
         return
 
     if len(schema.get("headers").keys()) == 42 : pass
     else :
-        print(f'NOT GOOD!\n\theaders count {len(schema.get("headers"))} not equal 10')
+        print(f'NOT GOOD!\n\theaders count expects 42 not {len(schema.get("headers"))}')
         return
 
     data = schema.get("headers").get("OID")
-    if not data == None and data["type"] == "Long" and data["index"] == "0" : pass
+    if not data == None and data["index"] == "1" and data["type"] == "Long" : pass
     else :
-        print(f'NOT GOOD!\n\tColumn: OID {{\'ndex\': \'0\', \'type\': \'Long\'}} not {data}')
+        print(f'NOT GOOD!\n\tOID column expects {{\'index\': \'1\', \'type\': \'Long\'}} not {data}')
         return
 
     data = schema.get("headers").get("State")
-    if not data == None and data["type"] == "Text" and not data["width"] == None and  data["width"] == '2' : pass
+    if not data == None and data["index"] == "2" and data["type"] == "Text" and not data["width"] == None and  data["width"] == '2' : pass
     else :
-        print(f'State not valid schema: {data}')
+        print(f'NOT GOOD!\n\tState column expects {{\'index\': \'2\', \'type\': \'Text\': \'2\'}} not {data}')
         return
 
     # example test case with a framework
