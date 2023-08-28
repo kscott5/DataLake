@@ -3,10 +3,10 @@ The [NAD](https://www.transportation.gov/gis/national-address-database) is a lis
 thought sharing their local data was safe. The CSV data file is 17 gigbytes
 in size.
 
-My plan was simple import with MongoImport. However, MongoImport stops if major
+My plan was simple import with MongoImport. However, [MongoImport](https://www.mongodb.com/docs/database-tools/mongoimport/) stops if major
 differences between the actual and expected number of columns. Therefore, my plan
-changed and this [python script](https://github.com/kscott5/DataLake/natladdrdb) with 
-the help of pymongo package did import the data. The concern with this approach was
+changed and my nadloader.py [python script](https://www.python.org/) with 
+the help from [pymongo](https://pypi.org/project/pymongo/) package did import the data. The concern with this approach was
 the start and stop completion time. The plan changed again,
 with sqlite3. 
 
