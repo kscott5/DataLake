@@ -1,5 +1,5 @@
 # National Address Database CSV import
-The NAD is a list of address within the United States from states that
+The [NAD](https://www.transportation.gov/gis/national-address-database) is a list of address within the United States from states that
 thought sharing their local data was safe. The CSV data file is 17 gigbytes
 in size.
 
@@ -10,7 +10,7 @@ the help of pymongo package did import the data. The concern with this approach 
 the start and stop completion time. The plan changed again,
 with sqlite3. 
 
-Sqlite is a simple and lightweight rational database management system 
+[Sqlite](https://sqlite.org/index.html) is a simple and lightweight rational database management system 
 available on linux operating systems with download versions available on 
 Apple Macs and Microsoft Windows. Sqlite start and stop completion time was about
 10 minutes, 30-40 minutes faster the my python script.
