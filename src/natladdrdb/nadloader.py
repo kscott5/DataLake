@@ -154,10 +154,11 @@ def loadNatlAddrData(schema) :
         json_array = []
         for line in dfile.readlines(readlinesHintSize) :
             data = line.rstrip('\n').split(',') 
+            data_exists = true
 
-            data_exists = false
+            # headers and data columns sequential array item index is the same
             if schema.get('headers_exists') == 'True' and len(headers)==len(data):
-                data_exists = true
+                data_exists = false
                 headers = ''
                 line = ''
                 
@@ -166,7 +167,7 @@ def loadNatlAddrData(schema) :
             json_array.append(InsertOne({
                 'headers': headers,
                 'data_exits': has_data,
-                'data': line,
+                'data': line, # actual
                 'json_data': json_data}))
 
         if len(json_array) > 0 :     
