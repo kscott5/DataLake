@@ -218,7 +218,7 @@ def startMulticoreProcessFor(function, args: Iterable[Any], message  = 'Multiple
 
 def main() :
     loadSponsorTestData()
-    loadAnimalTestData(1000000) #oops not 100 Million, 100000000
+    loadAnimalTestData(100000) #oops not 100 Million, 100000000
     #startMulticoreProcessFor(bulkLoadAnimalTestData, [100000,], 'loading animal test data with bulk write')
 
 if __name__ == "__main__":
