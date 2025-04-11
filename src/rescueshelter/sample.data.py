@@ -19,6 +19,17 @@ from multiprocessing import Pool
 from multiprocessing.pool import AsyncResult
 from typing import Iterable, Any
 
+SAMPLE_DATA_SIZE = 1000000
+
+# localhost:3302/api/manage/secure/data
+# https://github.com/kscott5/rescueshelter.services/src/middleware/DataEncryption.ts
+emailPassword = { 
+	'plaintext': 'P@$$w0rd1',
+	'encrypted': '6b704c1131df59acb475dee5ef1da4d8', 
+	'key': 'RS Default Secret Key', 
+	'iv': [191, 173, 60, 199, 43, 61, 43, 13, 54, 47, 28, 252, 36, 163, 161, 141]
+}
+
 emailDnsTypes = ['gmail.com', 'outlook.com', 'rescueshelter.co', 'yahoo.com']
 emailDns_choice = random.choice
 
@@ -85,16 +96,6 @@ def bulkWriteListSizes(totalWrites: int = 1000000) :
 
     return [0]
 
-# https://docs.python.org/3.7/library/hashlib.html?highlight=blake#hashlib.blake2b
-# https://www.npmjs.com/package/blake2
-def encryptedData(data, key = 'Rescue Shelter: Security Question Answer') :
-    tmpData = data.strip().encode('utf-8')
-    tmpKey = key.strip().encode('utf-8')
-
-    fn = blake2b(digest_size=16, key=tmpKey)
-    fn.update(tmpData)
-    return fn.hexdigest()
-
 def loadSponsorTestData() :
     print('Loading sponsor sample data')
 
@@ -103,7 +104,7 @@ def loadSponsorTestData() :
 
     col = db.get_collection("sponsors")
 
-    print('Use #P@ssw0rd1. with these available email:')
+    print(f'Use {emailPassword.get("plaintext")} with these available email:')
     for sponsor in itertools.combinations(animalCategoryTypes+animalImageIconTypes, 2) :
         firstname = ''.join(sponsor[0]).replace(' ', '')
         lastname = ''.join(sponsor[1])
@@ -121,12 +122,13 @@ def loadSponsorTestData() :
             'username': username,
             'photo': '',
             'security': {
-                'password': encryptedData(data='#P@ssw0rd1.', key=f'{useremail}')
+                'password': emailPassword.get('encrypted') 
             },
             'audit': []
         })
 
     client.close()
+    print(f'Use {emailPassword.get("plaintext")} with these available email:')
 
 def bulkLoadAnimalTestData(insert_count: int = 100000) :
     print('Loading sample animal data')    
@@ -218,7 +220,7 @@ def startMulticoreProcessFor(function, args: Iterable[Any], message  = 'Multiple
 
 def main() :
     loadSponsorTestData()
-    loadAnimalTestData(1000000) #oops not 100 Million, 100000000
+    loadAnimalTestData(SAMPLE_DATA_SIZE) #oops not 100 Million, 100000000
     #startMulticoreProcessFor(bulkLoadAnimalTestData, [100000,], 'loading animal test data with bulk write')
 
 if __name__ == "__main__":
