@@ -1,6 +1,7 @@
 import random
 import datetime
 import itertools
+import math
 from pymongo import MongoClient
 from pymongo.database import Database
 from pymongo.collection import Collection
@@ -155,14 +156,14 @@ def bulkLoadAnimalTestData(insert_count: int = 100000) :
 
     col = db.get_collection("animals")
 
-    initAnimalCategoryTypePercentage()
+    initAnimalCategoryTypePercentage()    
     batches = bulkWriteListSizes(insert_count)
     
     for batch_size in batches :
         starttime = datetime.datetime.now()
         
         for animalCategory in animalCategoryTypesDict:
-            category_size = batch_size*animalCategory["percentage"]
+            category_size = math.ceil(batch_size*animalCategory["percentage"])
             
             col.bulk_write([
                 InsertOne({            
@@ -181,10 +182,7 @@ def bulkLoadAnimalTestData(insert_count: int = 100000) :
                         },
                         'sponsors': []
                 }) 
-                for i in range(category_size)], ordered=False)
-        
-            print(f'type: {animalCategory["type"]}, {category_size} of {batch_size}')
-       
+                for i in range(category_size)], ordered=False)   
             
         endtime = datetime.datetime.now()
         print(f'Duration: {endtime-starttime}')
@@ -197,29 +195,33 @@ def loadAnimalTestData(insert_count: int = 100000) :
     starttime = datetime.datetime.now()
 
     batches = bulkWriteListSizes(insert_count)
+    initAnimalCategoryTypePercentage()
 
     client = MongoClient(connectionString)
     db = client.get_database("rescueshelter")
 
     col = db.get_collection("animals")
     for batch_size in batches :
-        col.insert_many([
-            {
-                'name': ''.join(word_generator(wordTemplate, wordSize)),
-                'description': description,
-                'image': { 
-                    'content': animalImageIconType_choice(animalImageIconTypes),
-                    'contenttype': 'icon'
-                },
-                'category': animalCategoryType_choice(animalCategoryTypes),
-                'endangered': endangeredTypes_choice(endangeredTypes),
-                'data': populationData(population_generator(size_min,size_max)),
-                'dates': {
-                    'created': datetime.datetime.utcnow(),
-                    'modified': datetime.datetime.utcnow()
-                },
-                'sponsors': []
-            } for i in range(batch_size)], ordered=False)
+        for animalCategory in animalCategoryTypesDict:
+            category_size = math.ceil(batch_size*animalCategory["percentage"])
+        
+            col.insert_many([
+                {
+                    'name': ''.join(word_generator(wordTemplate, wordSize)),
+                    'description': description,
+                    'image': { 
+                        'content': animalImageIconType_choice(animalImageIconTypes),
+                        'contenttype': 'icon'
+                    },
+                    'category': animalCategory['type'],
+                    'endangered': endangeredTypes_choice(endangeredTypes),
+                    'data': populationData(population_generator(size_min,size_max)),
+                    'dates': {
+                        'created': datetime.datetime.now(datetime.timezone.utc),
+                        'modified': datetime.datetime.now(datetime.timezone.utc)
+                    },
+                    'sponsors': []
+                } for i in range(category_size)], ordered=False)
     
     client.close()
 
