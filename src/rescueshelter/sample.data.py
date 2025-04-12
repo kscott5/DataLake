@@ -48,6 +48,15 @@ animalImageIconTypes = ['deskpro', 'docker', 'earlybirds', 'drupal', 'firefox',
 
 animalCategoryType_choice = random.choice
 animalCategoryTypes = ['fishes', 'amphibians', 'reptiles', 'birds', 'mammals', 'invertebrates']
+animalCategoryTypesDict = [
+    {'type':'fishes','percentage':0}, 
+    {'type':'amphibians','percentage':0},
+    {'type':'reptiles','percentage':0},
+    {'type':'birds','percentage':0},
+    {'type':'mammals','percentage':0},
+    {'type':'invertebrates','percentage':0}
+]
+animalCategoryTypePerctage = [0.39, 0.28, 0.22, .07, 0.3, 0.1]
 
 endangeredTypes_choice = random.choice #Saves the choice([]) function for use later
 endangeredTypes = [ True, False]
@@ -63,7 +72,7 @@ description = '''Lorem ipsum dōlor sit ǽmet, reqūe tation constiÞuto vis eu,
 
 def populationData(populationToday):
     delta = datetime.timedelta(days=-270)
-    utcnow = datetime.datetime.utcnow()
+    utcnow = datetime.datetime.now(datetime.timezone.utc)
     population = populationToday
 
     data = []
@@ -130,6 +139,14 @@ def loadSponsorTestData() :
     client.close()
     print(f'Use {emailPassword.get("plaintext")} with these available email:')
 
+def initAnimalCategoryTypePercentage():
+    for percentage in animalCategoryTypePerctage:
+     while(True):
+        category = animalCategoryType_choice(animalCategoryTypesDict)
+        if category['percentage'] == 0: 
+            category['percentage'] = percentage
+            break
+
 def bulkLoadAnimalTestData(insert_count: int = 100000) :
     print('Loading sample animal data')    
 
@@ -138,29 +155,37 @@ def bulkLoadAnimalTestData(insert_count: int = 100000) :
 
     col = db.get_collection("animals")
 
+    initAnimalCategoryTypePercentage()
     batches = bulkWriteListSizes(insert_count)
+    
     for batch_size in batches :
         starttime = datetime.datetime.now()
         
-        col.bulk_write([
-            InsertOne({            
-                    'name': ''.join(word_generator(wordTemplate, wordSize)),
-                    'description': description,
-                    'image': { 
-                        'content': animalImageIconType_choice(animalImageIconTypes),
-                        'contenttype': 'icon'
-                    },
-                    'category': animalCategoryType_choice(animalCategoryTypes),
-                    'endangered': endangeredTypes_choice(endangeredTypes),
-                    'data': populationData(population_generator(size_min,size_max)),
-                    'dates': {
-                        'created': datetime.datetime.utcnow(),
-                        'modified': datetime.datetime.utcnow()
-                    },
-                    'sponsors': []
-            }) 
-            for i in range(batch_size)], ordered=False)            
+        for animalCategory in animalCategoryTypesDict:
+            category_size = batch_size*animalCategory["percentage"]
+            
+            col.bulk_write([
+                InsertOne({            
+                        'name': ''.join(word_generator(wordTemplate, wordSize)),
+                        'description': description,
+                        'image': { 
+                            'content': animalImageIconType_choice(animalImageIconTypes),
+                            'contenttype': 'icon'
+                        },
+                        'category': animalCategory['type'],
+                        'endangered': endangeredTypes_choice(endangeredTypes),
+                        'data': populationData(population_generator(size_min,size_max)),
+                        'dates': {
+                            'created': datetime.datetime.now(datetime.timezone.utc),
+                            'modified': datetime.datetime.now(datetime.timezone.utc)
+                        },
+                        'sponsors': []
+                }) 
+                for i in range(category_size)], ordered=False)
         
+            print(f'type: {animalCategory["type"]}, {category_size} of {batch_size}')
+       
+            
         endtime = datetime.datetime.now()
         print(f'Duration: {endtime-starttime}')
     
