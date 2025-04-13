@@ -50,12 +50,12 @@ animalImageIconTypes = ['deskpro', 'docker', 'earlybirds', 'drupal', 'firefox',
 animalCategoryType_choice = random.choice
 animalCategoryTypes = ['fishes', 'amphibians', 'reptiles', 'birds', 'mammals', 'invertebrates']
 animalCategoryTypesDict = [
-    {'type':'fishes','percentage':0}, 
-    {'type':'amphibians','percentage':0},
-    {'type':'reptiles','percentage':0},
-    {'type':'birds','percentage':0},
-    {'type':'mammals','percentage':0},
-    {'type':'invertebrates','percentage':0}
+    {'id': 6,'type':'fishes','percentage':0}, 
+    {'id': 2,'type':'amphibians','percentage':0},
+    {'id': 4,'type':'reptiles','percentage':0},
+    {'id': 3,'type':'birds','percentage':0},
+    {'id': 5,'type':'mammals','percentage':0},
+    {'id': 1,'type':'invertebrates','percentage':0}
 ]
 animalCategoryTypePerctage = [0.39, 0.28, 0.22, .07, 0.3, 0.1]
 
@@ -174,6 +174,7 @@ def bulkLoadAnimalTestData(insert_count: int = 100000) :
                             'contenttype': 'icon'
                         },
                         'category': animalCategory['type'],
+                        'category_id': animalCategory['id'],
                         'endangered': endangeredTypes_choice(endangeredTypes),
                         'data': populationData(population_generator(size_min,size_max)),
                         'dates': {
@@ -214,6 +215,7 @@ def loadAnimalTestData(insert_count: int = 100000) :
                         'contenttype': 'icon'
                     },
                     'category': animalCategory['type'],
+                    'category_id': animalCategory['id'],
                     'endangered': endangeredTypes_choice(endangeredTypes),
                     'data': populationData(population_generator(size_min,size_max)),
                     'dates': {
@@ -248,7 +250,7 @@ def startMulticoreProcessFor(function, args: Iterable[Any], message  = 'Multiple
 def main() :
     loadSponsorTestData()
     loadAnimalTestData(SAMPLE_DATA_SIZE) #oops not 100 Million, 100000000
-    #startMulticoreProcessFor(bulkLoadAnimalTestData, [100000,], 'loading animal test data with bulk write')
+    #startMulticoreProcessFor(bulkLoadAnimalTestData, [100000,], 'loading animal test data with bulk write')=
 
 if __name__ == "__main__":
     main()
