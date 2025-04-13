@@ -20,7 +20,7 @@ from multiprocessing import Pool
 from multiprocessing.pool import AsyncResult
 from typing import Iterable, Any
 
-SAMPLE_DATA_SIZE = 1000000
+SAMPLE_DATA_SIZE = 10000
 
 # localhost:3302/api/manage/secure/data
 # https://github.com/kscott5/rescueshelter.services/src/middleware/DataEncryption.ts
