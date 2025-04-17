@@ -31,6 +31,11 @@ emailPassword = {
 	'iv': [191, 173, 60, 199, 43, 61, 43, 13, 54, 47, 28, 252, 36, 163, 161, 141]
 }
 
+# https://www.census.gov/topics/population/genealogy/data/2000_surnames.html
+surnames = ['Jones','Davis','Garcia']
+givenames =    ['Amanda','Scott','Kim']
+list_of_sponsors = []
+
 emailDnsTypes = ['gmail.com', 'outlook.com', 'rescueshelter.co', 'yahoo.com']
 emailDns_choice = random.choice
 
@@ -67,9 +72,9 @@ size_max = 500
 population_generator = random.randint #Saves the randint(min,max) function for use later
 
 description = '''Lorem ipsum dōlor sit ǽmet, reqūe tation constiÞuto vis eu, est ðōlor omnīum āntiopæm ei. 
-                Zril domīng cū eam, hās ið equīðem explīcærī voluptǽtum. Iusto regiōnē partiendo meǣ ne, vim 
-                cu ælii āltērum vōlutpāt, vis et aliquip trītæni. Dolor luptātum sapienÞem cu pēr, dico qūæs 
-                ðissentiǣs et eūm, vix ut.'''
+Zril domīng cū eam, hās ið equīðem explīcærī voluptǽtum. Iusto regiōnē partiendo meǣ ne, vim 
+cu ælii āltērum vōlutpāt, vis et aliquip trītæni. Dolor luptātum sapienÞem cu pēr, dico qūæs 
+ðissentiǣs et eūm, vix ut.'''
 
 def populationData(populationToday):
     delta = datetime.timedelta(days=-270)
@@ -77,16 +82,23 @@ def populationData(populationToday):
     population = populationToday
 
     data = []
-    for i in range(100) :
+    for i in range(10) :
         if i >= 1 : # entry
             utcnow = utcnow+delta 
-            population = random.randint(100, 200)
+            population = random.randint(39, 187)
 
         data.append({
             'population': population,
             'created': utcnow
         })
 
+    return data
+
+def populateAnimalSponsors():
+    random.shuffle(list_of_sponsors)
+    max_sponsors = random.randint(0, len(list_of_sponsors))
+
+    data = list_of_sponsors[0:max_sponsors].copy()
     return data
 
 def bulkWriteListSizes(totalWrites: int = 1000000) : 
@@ -115,7 +127,7 @@ def loadSponsorTestData() :
     col = db.get_collection("sponsors")
 
     print(f'Use {emailPassword.get("plaintext")} with these available email:')
-    for sponsor in itertools.combinations(animalCategoryTypes+animalImageIconTypes, 2) :
+    for sponsor in itertools.combinations(surnames+givenames, 2) :
         firstname = ''.join(sponsor[0]).replace(' ', '')
         lastname = ''.join(sponsor[1])
 
@@ -136,6 +148,13 @@ def loadSponsorTestData() :
             },
             'audit': []
         })
+
+    sponsors = col.aggregate([
+        {'$project': {'_id': '$_id', 'firstname': '$firstname', 'lastname': '$lastname'}}]).to_list()
+    
+    [list_of_sponsors.append({'_id':sponsor['_id'],
+        'firstname': sponsor['firstname'], 'lastname': sponsor['lastname'] }) 
+        for sponsor in sponsors]
 
     client.close()
     print(f'Use {emailPassword.get("plaintext")} with these available email:')
@@ -181,7 +200,7 @@ def bulkLoadAnimalTestData(insert_count: int = 100000) :
                             'created': datetime.datetime.now(datetime.timezone.utc),
                             'modified': datetime.datetime.now(datetime.timezone.utc)
                         },
-                        'sponsors': []
+                        'sponsors': populateAnimalSponsors()
                 }) 
                 for i in range(category_size)], ordered=False)   
             
@@ -189,7 +208,6 @@ def bulkLoadAnimalTestData(insert_count: int = 100000) :
         print(f'Duration: {endtime-starttime}')
     
     client.close()
-
 
 def loadAnimalTestData(insert_count: int = 100000) :
     print('Loading sample animal data')
@@ -222,7 +240,7 @@ def loadAnimalTestData(insert_count: int = 100000) :
                         'created': datetime.datetime.now(datetime.timezone.utc),
                         'modified': datetime.datetime.now(datetime.timezone.utc)
                     },
-                    'sponsors': []
+                    'sponsors': populateAnimalSponsors()
                 } for i in range(category_size)], ordered=False)
     
     client.close()
