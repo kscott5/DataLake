@@ -2,12 +2,14 @@ import random
 import datetime
 import itertools
 import math
+import bson
 from pymongo import MongoClient
 from pymongo.database import Database
 from pymongo.collection import Collection
 from pymongo.operations import InsertOne
 
-connectionString = "mongodb://localhost:27017"
+# connectionString = "mongodb://localhost:27017"
+connectionString = "mongodb+srv://cluster0.dol02bo.mongodb.net/?authSource=%24external&authMechanism=MONGODB-X509&retryWrites=true&tlsCertificateKeyFile=./X509-adminanydb-cert.pem&w=majority&appName=Cluster0"
 
 # Python 3.7 in use.
 # Python 3.6 minimal requirement
@@ -124,7 +126,8 @@ def loadSponsorTestData() :
     client = MongoClient(connectionString)
     db = client.get_database("rescueshelter")
 
-    col = db.get_collection("sponsors")
+    sponsorsCol = db.get_collection("sponsors")
+    securityCol = db.get_collection("security")
 
     print(f'Use {emailPassword.get("plaintext")} with these available email:')
     for sponsor in itertools.combinations(surnames+givenames, 2) :
@@ -137,19 +140,25 @@ def loadSponsorTestData() :
 
         print(f'\t{useremail}')
 
-        col.insert_one({
+        _id = bson.ObjectId()        
+        sponsorsCol.insert_one({
+            '_id': _id,
             'firstname': firstname,
             'lastname': lastname,
             'useremail': useremail,
             'username': username,
             'photo': '',
-            'security': {
-                'password': emailPassword.get('encrypted') 
-            },
             'audit': []
         })
 
-    sponsors = col.aggregate([
+        securityCol.insert_one({
+            '_id': _id,
+            'sponsor_id': _id,
+            'password': emailPassword.get('encrypted'),
+            'questions': [],
+        })
+
+    sponsors = sponsorsCol.aggregate([
         {'$project': {'_id': '$_id', 'firstname': '$firstname', 'lastname': '$lastname'}}]).to_list()
     
     [list_of_sponsors.append({'_id':sponsor['_id'],
